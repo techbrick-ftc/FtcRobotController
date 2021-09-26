@@ -36,16 +36,21 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
     protected TelemetryPacket packet = new TelemetryPacket();
 
     // vars used in program
+    protected int activePosition;
     protected int startingPoseX;
     protected int startingPoseY;
-    protected int cameraX;
-    protected int cameraY;
+    protected int camera1X;
+    protected int camera1Y;
+    protected int camera2X;
+    protected int camera2Y;
 
-    public AutoImport(int startX, int startY, int camX, int camY) {
+    public AutoImport(int startX, int startY, int cam1X, int cam1Y, int cam2X, int cam2Y) {
         startingPoseX = startX;
         startingPoseY = startY;
-        cameraX = camX;
-        cameraY = camY;
+        camera1X = cam1X;
+        camera1Y = cam1Y;
+        camera2X = cam2X;
+        camera2Y = cam2Y;
     }
 
     public boolean driverAbort() {
@@ -76,7 +81,8 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         telemetry.update();
 
         // initializes easyopencv
-        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, cameraX, cameraY, 45, 18);
+        // width and height of vision box are hardcoded here
+        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, camera1X, camera1Y, camera2X, camera2Y, 45, 18);
 
         // initializes slamra
         Transform2d cameraToRobot = new Transform2d(new Translation2d(6 * 0.0254, 7 * 0.0254), Rotation2d.fromDegrees(-90));
@@ -98,7 +104,11 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         camera.startDetection();
         // loops this until start is pressed
         while (!isStarted()) {
-            // you can put telemetry here
+            activePosition = elementPosition(0, camera);
+            packet.put("Position", activePosition);
+            dashboard.sendTelemetryPacket(packet);
+            telemetry.addData("Position", activePosition);
+            telemetry.update();
         }
         camera.stopDetection();
 
@@ -111,6 +121,23 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
     }
 
     // you can make functions in here to use in auto programs
+
+    // Function which uses the webcam to return the team element's position
+    // there is definitely a more efficient way to do this
+    public int elementPosition(long delay, EasyOpenCVImportable camera) {
+        int position = 0;
+        sleep(delay);
+        EasyOpenCVImportable.Position rings = camera.getDetection();
+        if (rings.equals(EasyOpenCVImportable.Position.TWO)) {
+            position = 2;
+        } else if (rings.equals(EasyOpenCVImportable.Position.ONE)) {
+            position = 1;
+        } else if (rings.equals(EasyOpenCVImportable.Position.ZERO)) {
+            position = 0;
+        }
+        System.out.println("Position: " + position);
+        return position;
+    }
 
     // Function which sets encoder values to 0, and waits until they have reset
     public void resetEnc(DcMotor motor) {
