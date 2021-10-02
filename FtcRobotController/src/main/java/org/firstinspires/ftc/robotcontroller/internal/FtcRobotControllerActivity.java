@@ -706,7 +706,7 @@ public class FtcRobotControllerActivity extends Activity
     });
 
     AnnotatedHooksClassFilter.getInstance().callWebHandlerRegistrarMethods(this,
-            service.getWebServer().getWebHandlerManager());
+        service.getWebServer().getWebHandlerManager());
   }
 
   private void updateUIAndRequestRobotSetup() {
