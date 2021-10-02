@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.libs.Globals.startCamera;
 import static org.firstinspires.ftc.teamcode.libs.Globals.stopCamera;
 import static java.lang.Math.PI;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.libs.TeleAuto;
 import org.firstinspires.ftc.teamcode.libs.TestBot;
 
 @TeleOp(name="",group="")
+@Disabled
 public class RunTeleCamera extends LinearOpMode implements TeleAuto {
     private final TestBot robot = new TestBot();
     private final FieldCentric drive = new FieldCentric();
