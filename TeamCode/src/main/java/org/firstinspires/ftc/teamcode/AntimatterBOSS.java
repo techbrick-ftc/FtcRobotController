@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -23,6 +24,7 @@ public class AntimatterBOSS extends LinearOpMode {
     DcMotor fr;
     DcMotor rl;
     DcMotor rr;
+    TouchSensor ts1;
     boolean autorunning = false;
     double angle = 0;
     double driveSpeed = 1.00;
@@ -101,6 +103,7 @@ public class AntimatterBOSS extends LinearOpMode {
     }
         @Override
     public void runOpMode() {
+        ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
@@ -119,6 +122,12 @@ public class AntimatterBOSS extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime timer2 = new ElapsedTime();
         while (opModeIsActive()) {
+            if (ts1.isPressed()) {
+                fl.setPower(1);
+                rl.setPower(1);
+                fr.setPower(-1);
+                rr.setPower(-1);
+            }
             if (Diagnostics) {
                 Diagnostics_Show(telemetry);
             }
@@ -199,4 +208,3 @@ public class AntimatterBOSS extends LinearOpMode {
         }
     }
 }
-
