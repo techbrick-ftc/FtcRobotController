@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @TeleOp(name="Antimatter BOSS")
 public class AntimatterBOSS extends LinearOpMode {
+    boolean Diagnostics = false;
     DcMotor fl;
     DcMotor fr;
     DcMotor rl;
@@ -24,8 +26,34 @@ public class AntimatterBOSS extends LinearOpMode {
     boolean autorunning = false;
     double angle = 0;
     double driveSpeed = 1.00;
+    private void Diagnostics_Show(Telemetry telemetry) {
+        telemetry.addLine("gamepad1.left_stick_x:" + gamepad1.left_stick_x);
+        telemetry.addLine("gamepad1.left_stick_y:" + gamepad1.left_stick_y);
+        telemetry.addLine("gamepad1.right_stick_x:" + gamepad1.right_stick_x);
+        telemetry.addLine("gamepad1.right_stick_y:" + gamepad1.right_stick_y);
+        telemetry.addLine("gamepad1.a:" + gamepad1.a);
+        telemetry.addLine("gamepad1.b:" + gamepad1.b);
+        telemetry.addLine("gamepad1.x:" + gamepad1.x);
+        telemetry.addLine("gamepad1.y:" + gamepad1.y);
+        telemetry.addLine("gamepad1.dpad_left:" + gamepad1.dpad_left);
+        telemetry.addLine("gamepad1.dpad_right:" + gamepad1.dpad_right);
+        telemetry.addLine("gamepad1.dpad_up:" + gamepad1.dpad_up);
+        telemetry.addLine("gamepad1.dpad_down:" + gamepad1.dpad_down);
+        telemetry.addLine("gamepad1.left_trigger:" + gamepad1.left_trigger);
+        telemetry.addLine("gamepad1.right_trigger:" + gamepad1.right_trigger);
+        telemetry.addLine("gamepad1.start:" + gamepad1.start);
+        telemetry.addLine("gamepad1.back:" + gamepad1.back);
+        telemetry.addLine("fl.power:" + fl.getPower());
+        telemetry.addLine("fr.power:" + fr.getPower());
+        telemetry.addLine("rl.power:" + rl.getPower());
+        telemetry.addLine("rr.power:" + rr.getPower());
+        telemetry.addLine("IMU.firstAngle:" + Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle);
+        telemetry.addLine("IMU.secondAngle:" + Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).secondAngle);
+        telemetry.addLine("IMU.thirdAngle:" + Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).thirdAngle);
+        telemetry.addLine("IMU_SUBTRACTION_ANGLE:" + angle);
+        telemetry.update();
+    }
     public void drive(double x2, double y2, double rx) {
-
         double x = x2;
         double y = y2;
         if (!autorunning) {
@@ -43,10 +71,16 @@ public class AntimatterBOSS extends LinearOpMode {
         rl.setPower(backLeftPower * driveSpeed);
         fr.setPower(frontRightPower * driveSpeed);
         rr.setPower(backRightPower * driveSpeed);
+        if (Diagnostics) {
+            Diagnostics_Show(telemetry);
+        }
 
     }
     public void autorun(double x, double y) {
         while (autorunning && opModeIsActive()) {
+            if (Diagnostics) {
+                Diagnostics_Show(telemetry);
+            }
             drive(x, y, gamepad1.right_stick_x);
             if (gamepad1.back) {
                 autorunning = false;
@@ -85,7 +119,13 @@ public class AntimatterBOSS extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime timer2 = new ElapsedTime();
         while (opModeIsActive()) {
+            if (Diagnostics) {
+                Diagnostics_Show(telemetry);
+            }
             while (victoryDance && opModeIsActive() && timer.seconds() < 10) {
+                if (Diagnostics) {
+                    Diagnostics_Show(telemetry);
+                }
                 if (timer2.seconds() >= 2.5) {
                     timer2.reset();
                     victoryDanceL = !victoryDanceL;
@@ -143,6 +183,14 @@ public class AntimatterBOSS extends LinearOpMode {
             }
             if (gamepad1.left_stick_button) {
                 angle = Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+                if (Diagnostics) {
+                    Diagnostics_Show(telemetry);
+                }
+            }
+            if (gamepad1.y && !cp1.y) {
+                Diagnostics = !Diagnostics;
+                telemetry.addLine("Diagnostics: " + Diagnostics);
+                telemetry.update();
             }
             try {
                 cp1.copy(gamepad1);
