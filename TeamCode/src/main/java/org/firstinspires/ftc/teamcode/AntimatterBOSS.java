@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -22,7 +23,7 @@ public class AntimatterBOSS extends LinearOpMode {
     DcMotor rr;
     boolean autorunning = false;
     double angle = 0;
-    double driveSpeed = 1;
+    double driveSpeed = 1.00;
     public void drive(double x2, double y2, double rx) {
 
         double x = x2;
@@ -79,20 +80,27 @@ public class AntimatterBOSS extends LinearOpMode {
         fl.setDirection(DcMotorSimple.Direction.REVERSE); rl.setDirection(DcMotorSimple.Direction.REVERSE);
         double turningspeed = 1;
         Gamepad cp1 = new Gamepad();
-        int victoryDance = 0;
+        boolean victoryDance = false;
         boolean victoryDanceL = true;
-
+        ElapsedTime timer = new ElapsedTime();
+        ElapsedTime timer2 = new ElapsedTime();
         while (opModeIsActive()) {
-            while (victoryDance > 0 && opModeIsActive()) {
-                if (victoryDance % 100 == 0) {
+            while (victoryDance && opModeIsActive() && timer.seconds() < 10) {
+                if (timer2.seconds() >= 2.5) {
+                    timer2.reset();
                     victoryDanceL = !victoryDanceL;
+                    timer2.startTime();
                 }
                 drive(0, 0, victoryDanceL ? -0.75 : 0.75);
-
-                victoryDance -= 1;
+            }
+            if (timer.seconds() > 10) {
+                victoryDance = false;
             }
             if (gamepad1.b) {
-                victoryDance = 500;
+                victoryDance = true;
+                timer.reset();
+                timer.startTime();
+
             }
             if (gamepad1.left_trigger > 0.5) {
                 driveSpeed -= 0.25;

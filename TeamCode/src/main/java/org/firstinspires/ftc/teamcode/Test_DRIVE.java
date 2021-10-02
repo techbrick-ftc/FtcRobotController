@@ -29,6 +29,7 @@ public class Test_DRIVE extends LinearOpMode {
         rl.setPower(1);
         rr.setPower(1);
         while (opModeIsActive()) {
+            idle();
         }
     }
 }
