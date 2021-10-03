@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.libs;
 
-import android.content.Context;
-
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,10 +20,21 @@ import com.spartronics4915.lib.T265Camera;
 public class Globals {
     private static T265Camera camera;
     private static BNO055IMU imu;
+    private static Transform2d transform = new Transform2d();
+
+    public static void setCameraStart(Transform2d transform2d) {
+        if (camera == null) {
+            transform = transform2d;
+        }
+    }
 
     public static void setupCamera(HardwareMap hardwareMap) {
         if (camera == null) {
-            camera = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
+            camera = new T265Camera(
+                    transform,
+                    0.8,
+                    hardwareMap.appContext
+            );
         }
     }
 
