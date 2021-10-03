@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.libs.CameraAuto;
+import org.firstinspires.ftc.teamcode.libs.Globals;
 import org.firstinspires.ftc.teamcode.libs.TeleAuto;
 import org.firstinspires.ftc.teamcode.libs.TestBot;
 
@@ -33,11 +34,9 @@ public class CameraRun extends LinearOpMode implements TeleAuto {
         startCamera();
 
         if (opModeIsActive()) {
-            cameraAuto.goToPosition(10, 10, this);
-            sleep(1000);
             cameraAuto.goToRotation(PI, this);
             sleep(1000);
-            cameraAuto.goTo(5, 0, 0, 0.5, this);
+            cameraAuto.goToRotation(7*PI/4, this);
         }
 
         stopCamera();
