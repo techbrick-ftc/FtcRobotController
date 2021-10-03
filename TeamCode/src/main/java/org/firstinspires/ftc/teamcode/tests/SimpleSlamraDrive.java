@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 
-@Autonomous(name="SimpleSlamraDrive", group="Test")
+@Autonomous(name="SimpleSlamraDrive", group="test")
 public class SimpleSlamraDrive extends AutoImport {
 
     public SimpleSlamraDrive() { super(31, -56, 225, 150, 0, 0); }

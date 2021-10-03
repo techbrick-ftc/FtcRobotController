@@ -27,6 +27,11 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
     protected DcMotor m2 = null;
     protected DcMotor m3 = null;
     protected DcMotor m4 = null;
+    protected DcMotor arm = null;
+    protected DcMotor intake = null;
+    protected CRServo spinner = null;
+    protected Servo intakeHatch = null;
+    //protected TouchSensor armTouch = null;
 
     protected SimpleSlamra slauto = new SimpleSlamra();
     protected EasyOpenCVImportable camera = new EasyOpenCVImportable();
@@ -69,6 +74,14 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         m4.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         m1.setDirection(DcMotor.Direction.REVERSE);
         m4.setDirection(DcMotor.Direction.REVERSE);
+
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        spinner = hardwareMap.get(CRServo.class, "spinner");
+        intakeHatch = hardwareMap.get(Servo.class, "intakeHatch");
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //armTouch = hardwareMap.get(TouchSensor.class, "armTouch");
 
         // initializes imu
         imu = hardwareMap.get(BNO055IMU.class, "imu");

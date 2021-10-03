@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 
-@Autonomous(name="DetectionTest", group="tests")
+@Autonomous(name="DetectionTest", group="test")
 public class DetectionTest extends AutoImport {
 
     public DetectionTest() {
