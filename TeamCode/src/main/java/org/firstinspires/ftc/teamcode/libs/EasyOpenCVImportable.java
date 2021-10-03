@@ -24,19 +24,23 @@ public class EasyOpenCVImportable {
     private UltimateGoalDetectionPipeline pipeline;
     private boolean detecting;
 
-    private static int posX;
-    private static int posY;
+    private static int box1PosX;
+    private static int box1PosY;
+    private static int box2PosX;
+    private static int box2PosY;
     private static int width;
     private static int height;
 
-    public void init(CameraType cameraType, final HardwareMap hardwareMap, int posX, int posY, int width, int height) {
+    public void init(CameraType cameraType, final HardwareMap hardwareMap, int box1PosX, int box1PosY, int box2PosX, int box2PosY, int width, int height) {
         if (cameraType.equals(CameraType.WEBCAM)) {
             initWebcam(hardwareMap, "Webcam 1");
         } else {
             initPhone(hardwareMap);
         }
-        EasyOpenCVImportable.posX = posX;
-        EasyOpenCVImportable.posY = posY;
+        EasyOpenCVImportable.box1PosX = box1PosX;
+        EasyOpenCVImportable.box1PosY = box1PosY;
+        EasyOpenCVImportable.box2PosX = box2PosX;
+        EasyOpenCVImportable.box2PosY = box2PosY;
         EasyOpenCVImportable.width = width;
         EasyOpenCVImportable.height = height;
     }
@@ -101,17 +105,11 @@ public class EasyOpenCVImportable {
 
     public OpenCvInternalCamera getPhoneCamera() { return this.phoneCamera; }
 
-    public RingNumber getDetection() { return this.pipeline.number; }
+    public int getDetection() { return this.pipeline.position; }
 
     public boolean getDetecting() { return this.detecting; }
 
-    public enum RingNumber {
-        NONE,
-        ONE,
-        FOUR
-    }
-
-    public int getAnalysis() { return this.pipeline.avg1; }
+    public int[] getAnalysis() { return new int[]{this.pipeline.sum1, this.pipeline.sum2}; }
 
     private static class UltimateGoalDetectionPipeline extends OpenCvPipeline {
 
@@ -121,13 +119,11 @@ public class EasyOpenCVImportable {
         static final Scalar GREEN = new Scalar(0, 255, 0);
 
         // Core values for position and size
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(posX, posY);
+        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(box1PosX, box1PosY);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(box2PosX, box2PosY);
 
         static final int REGION_WIDTH = width;
         static final int REGION_HEIGHT = height;
-
-        final int FOUR_RING_THRESHOLD = 160;
-        final int ONE_RING_THRESHOLD = 135;
 
         Point region1_pointA = new Point(
                 REGION1_TOPLEFT_ANCHOR_POINT.x,
@@ -136,14 +132,22 @@ public class EasyOpenCVImportable {
                 REGION1_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
                 REGION1_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
 
+        Point region2_pointA = new Point(
+                REGION2_TOPLEFT_ANCHOR_POINT.x,
+                REGION2_TOPLEFT_ANCHOR_POINT.y);
+        Point region2_pointB = new Point(
+                REGION2_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
+                REGION2_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+
         // Working variables
         Mat region1_Cb;
+        Mat region2_Cb;
         Mat YCrCb = new Mat();
         Mat Cb = new Mat();
-        int avg1;
+        int sum1;
+        int sum2;
 
-        // Volatile since accessed by OpMode w/o synchronization
-        private volatile RingNumber number = RingNumber.FOUR;
+        private volatile int position = -1;
 
         /*
             This take the RGB frame and converts it to YCrCb,
@@ -158,13 +162,23 @@ public class EasyOpenCVImportable {
         public void init(Mat firstFrame) {
             inputToCb(firstFrame);
             region1_Cb = Cb.submat(new Rect(region1_pointA, region1_pointB));
+            region2_Cb = Cb.submat(new Rect(region2_pointA, region2_pointB));
         }
 
         @Override
         public Mat processFrame(Mat input) {
             inputToCb(input);
 
-            avg1 = (int) Core.mean(region1_Cb).val[0];
+            sum1 = (int) Core.mean(region1_Cb).val[0];
+            sum2 = (int) Core.mean(region2_Cb).val[0];
+
+            if (sum1 < 30) {
+                this.position = 0;
+            } else if (sum2 < 30) {
+                this.position = 1;
+            } else if (sum1 > 30 && sum2 > 30) {
+                this.position = 2;
+            }
 
             Imgproc.rectangle(
                     input,
@@ -172,20 +186,11 @@ public class EasyOpenCVImportable {
                     region1_pointB,
                     BLUE, 2);
 
-            number = RingNumber.FOUR;
-            if (avg1 > FOUR_RING_THRESHOLD) {
-                number = RingNumber.FOUR;
-            } else if (avg1 > ONE_RING_THRESHOLD) {
-                number = RingNumber.ONE;
-            } else {
-                number = RingNumber.NONE;
-            }
-
             Imgproc.rectangle(
                     input,
-                    region1_pointA,
-                    region1_pointB,
-                    GREEN, -1);
+                    region2_pointA,
+                    region2_pointB,
+                    GREEN, 2);
 
             return input;
         }
