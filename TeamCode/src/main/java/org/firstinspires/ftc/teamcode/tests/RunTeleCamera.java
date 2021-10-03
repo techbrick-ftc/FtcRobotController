@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tests;
 
 import static org.firstinspires.ftc.teamcode.libs.Globals.startCamera;
 import static org.firstinspires.ftc.teamcode.libs.Globals.stopCamera;

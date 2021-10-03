@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tests;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.Direction;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode;
