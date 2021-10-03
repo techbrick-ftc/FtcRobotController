@@ -121,12 +121,16 @@ public class AntimatterBOSS extends LinearOpMode {
         boolean victoryDanceL = true;
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime timer2 = new ElapsedTime();
+        ElapsedTime timer3 = new ElapsedTime();
         while (opModeIsActive()) {
             if (ts1.isPressed()) {
-                fl.setPower(1);
-                rl.setPower(1);
-                fr.setPower(-1);
-                rr.setPower(-1);
+                timer3.reset();
+                while (timer3.seconds() < 3 && opModeIsActive()) {
+                    fl.setPower(1);
+                    rl.setPower(1);
+                    fr.setPower(1);
+                    rr.setPower(1);
+                }
             }
             if (Diagnostics) {
                 Diagnostics_Show(telemetry);
