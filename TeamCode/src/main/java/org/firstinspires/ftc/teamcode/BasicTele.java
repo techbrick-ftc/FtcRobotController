@@ -14,8 +14,11 @@ import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 @TeleOp(name="BasicTele", group="generic")
 public class BasicTele extends AutoImport {
 
-    public BasicTele() { super(31, -56, 225, 150, 335, 150); }
+    public BasicTele() { super(31, -56, 225, 150, 255, 150); }
     FieldCentric drive = new FieldCentric();
+    public boolean driverAbort() {
+        return gamepad1.y;
+    }
 
     @Override
     public void runOpMode() {
@@ -34,7 +37,7 @@ public class BasicTele extends AutoImport {
 
         // Sets up motor configs
         try {
-            drive.setUp(motors, motorAngles);
+            drive.setUp(motors, motorAngles, imu);
         } catch (Exception e) {
             packet.put("SETUP ERROR", true);
             dashboard.sendTelemetryPacket(packet);
@@ -49,6 +52,10 @@ public class BasicTele extends AutoImport {
 
         // Set up variables
         boolean isSpinning = false;
+        boolean hatchOpen = false;
+
+        // Starting servo positions
+        intakeHatch.setPosition(-1);
 
         waitForStart();
     
@@ -63,22 +70,30 @@ public class BasicTele extends AutoImport {
                 idle();
             }
 
+            // Gives FieldCentric the stick positions
+            drive.Drive(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+
             // Controls arm
-            double armPower = Range.clip(gamepad2.left_stick_y, -0.75, 0.75);
+            double armPower = Range.clip(gamepad2.left_stick_y, -0.5, 0.5);
             arm.setPower(armPower);
 
             // Controls intake
             if (gamepad2.right_trigger > 0.1) {
+                intake.setPower(-1);
+            } else if (gamepad2.left_trigger > 0.1) {
                 intake.setPower(1);
             } else {
                 intake.setPower(0);
             }
 
             // Controls intake hatch
-            /*
-            TODO:
-                put something here
-             */
+            if (!hatchOpen && cur2.b && !prev2.b) {
+                intakeHatch.setPosition(1);
+                hatchOpen = true;
+            } else if (hatchOpen && cur2.b && !prev2.b) {
+                intakeHatch.setPosition(-1);
+                hatchOpen = false;
+            }
 
             // Toggles spinner
             if (!isSpinning && cur2.a && !prev2.a) {
@@ -87,6 +102,11 @@ public class BasicTele extends AutoImport {
             } else if (isSpinning && cur2.a && !prev2.a) {
                 spinner.setPower(0);
                 isSpinning = false;
+            }
+
+            // Reset Field Centric button
+            if (cur1.a && !prev1.a) {
+                drive.newOffset();
             }
 
             // Updates prev1 & 2
