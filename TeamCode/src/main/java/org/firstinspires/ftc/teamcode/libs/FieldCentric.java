@@ -20,7 +20,7 @@ public class FieldCentric {
     private double theta;
     private double angle;
     private double angle() { return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle; }
-    private final BNO055IMU imu = getImu();
+    private BNO055IMU imu;
 
     private double[] wheelPowers;
 
@@ -36,7 +36,9 @@ public class FieldCentric {
         this.motors = motors;
         this.wheelAngles = wheelAngles;
         this.wheelPowers = new double[motors.length];
+        // TODO: initialize imu before calling angle();
         this.offset = angle();
+        this.imu = getImu();
     }
 
     public void resetAngle() {
