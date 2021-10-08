@@ -51,7 +51,8 @@ public class BasicTele extends AutoImport {
         Gamepad cur2 = new Gamepad();
 
         // Set up variables
-        boolean isSpinning = false;
+        boolean isSpinningForth = false;
+        boolean isSpinningBack = false;
         boolean hatchOpen = false;
 
         // Starting servo positions
@@ -74,7 +75,7 @@ public class BasicTele extends AutoImport {
             drive.Drive(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
 
             // Controls arm
-            double armPower = Range.clip(gamepad2.left_stick_y, -0.5, 0.5);
+            double armPower = Range.clip(-gamepad2.left_stick_y, -0.5, 0.5);
             arm.setPower(armPower);
 
             // Controls intake
@@ -96,12 +97,16 @@ public class BasicTele extends AutoImport {
             }
 
             // Toggles spinner
-            if (!isSpinning && cur2.a && !prev2.a) {
+            if (!isSpinningForth && cur2.a && !prev2.a) {
                 spinner.setPower(1);
-                isSpinning = true;
-            } else if (isSpinning && cur2.a && !prev2.a) {
+                isSpinningForth = true;
+            } else if (!isSpinningBack && cur2.x && !prev2.x) {
+                spinner.setPower(-1);
+                isSpinningBack = true;
+            } else if ((isSpinningForth || isSpinningBack) && (cur2.a && !prev2.a) || (cur2.x && !prev2.x)) {
                 spinner.setPower(0);
-                isSpinning = false;
+                isSpinningForth = false;
+                isSpinningBack = false;
             }
 
             // Reset Field Centric button

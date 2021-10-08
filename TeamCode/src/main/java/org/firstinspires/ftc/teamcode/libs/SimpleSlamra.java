@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.libs.TeleAuto;
-import org.firstinspires.ftc.teamcode.libs.GlobalSlamra;
+import org.firstinspires.ftc.teamcode.libs.Globals;
 
 import static java.lang.Math.abs;
 
@@ -176,7 +176,7 @@ public class SimpleSlamra {
 
     private boolean getPosition() {
         // Gathers data from the T265 camera, saving it as a translation2d used to get the current X and Y positions
-        T265Camera.CameraUpdate up = GlobalSlamra.getUpdate();
+        T265Camera.CameraUpdate up = Globals.getCamera().getLastReceivedCameraUpdate();
         if (up.confidence == T265Camera.PoseConfidence.Failed) {
             System.out.println("Skipping loop");
             return false;
@@ -277,4 +277,3 @@ public class SimpleSlamra {
         return newTheta;
     }
 }
-
