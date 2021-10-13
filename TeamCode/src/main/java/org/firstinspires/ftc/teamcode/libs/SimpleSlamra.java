@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.libs;
+import static org.firstinspires.ftc.teamcode.libs.Globals.*;
 
 // Setting up importations
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -17,13 +18,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.libs.TeleAuto;
-import org.firstinspires.ftc.teamcode.libs.Globals;
 
 import static java.lang.Math.abs;
 
 public class SimpleSlamra {
 
     // Defines globally used variables
+    private T265Camera camera;
     private DcMotor[] motors;
     private double currentX;
     private double currentY;
@@ -44,6 +45,7 @@ public class SimpleSlamra {
         this.motors = motors;
         this.wheelPowers = new double[motors.length];
         this.telemetry = telemetry;
+        this.camera = getCamera();
     }
 
     public void drive(double targetX, double targetY, double targetDegree, double speed, TeleAuto callback) {
@@ -176,7 +178,7 @@ public class SimpleSlamra {
 
     private boolean getPosition() {
         // Gathers data from the T265 camera, saving it as a translation2d used to get the current X and Y positions
-        T265Camera.CameraUpdate up = Globals.getCamera().getLastReceivedCameraUpdate();
+        T265Camera.CameraUpdate up = camera.getLastReceivedCameraUpdate();
         if (up.confidence == T265Camera.PoseConfidence.Failed) {
             System.out.println("Skipping loop");
             return false;

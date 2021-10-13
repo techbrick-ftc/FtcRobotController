@@ -1,6 +1,7 @@
 // Our parent auto program, which is used in other auto programs.
 
 package org.firstinspires.ftc.teamcode.libs;
+import static org.firstinspires.ftc.teamcode.libs.Globals.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -98,8 +99,8 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, camera1X, camera1Y, camera2X, camera2Y, 45, 18);
 
         // initializes slamra
-        Globals.setupCamera(hardwareMap);
-        Globals.startCamera();
+        setupCamera(hardwareMap);
+        startCamera();
 
         telemetry.addLine("Cameras Done");
         telemetry.update();

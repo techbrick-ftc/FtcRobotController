@@ -50,6 +50,9 @@ public class Globals {
     public static BNO055IMU getImu() { return imu; }
     public static T265Camera getCamera() { return camera; }
 
-    public static void startCamera() { camera.start(); }
+    public static void startCamera() {
+        if (camera.isStarted()) { camera.stop(); }
+        camera.start();
+    }
     public static void stopCamera() { camera.stop(); }
 }
