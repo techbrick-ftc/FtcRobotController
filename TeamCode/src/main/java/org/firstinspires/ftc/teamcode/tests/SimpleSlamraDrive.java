@@ -17,9 +17,8 @@ public class SimpleSlamraDrive extends AutoImport {
         if (opModeIsActive()) {
             packet.addLine("Starting Travel");
             dashboard.sendTelemetryPacket(packet);
-            slauto.drive(0, 40, 0, 1, this);
+            slauto.drive(-40, 0, 0, 1, 0, this, true, true);
             packet.addLine("Arrived");
-            sleep(5000);
             dashboard.sendTelemetryPacket(packet);
             stopCamera();
         }

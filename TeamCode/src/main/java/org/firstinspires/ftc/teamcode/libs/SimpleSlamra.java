@@ -128,7 +128,7 @@ public class SimpleSlamra {
             double newSpeed = speed;
             if (doSlow) {
                 doAccel = false;
-                newSpeed *= clamp(0.3, 1, diffAvg / 10);
+                newSpeed *= clamp(0.5, 1, diffAvg / 10);
             }
 
             // Slowly ramps up wheel powers as it begins moving

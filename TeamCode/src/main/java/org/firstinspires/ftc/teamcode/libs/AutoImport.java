@@ -100,6 +100,7 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
 
         // initializes slamra
         setupCamera(hardwareMap);
+        sleep(5000);
         startCamera();
 
         telemetry.addLine("Cameras Done");
@@ -149,7 +150,6 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         } else if (rings.equals(EasyOpenCVImportable.Position.ZERO)) {
             position = 0;
         }
-        System.out.println("Position: " + position);
         return position;
     }
 
