@@ -49,6 +49,8 @@ import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -763,7 +765,7 @@ public class FtcRobotControllerActivity extends Activity
     if (controllerService != null) controllerService.shutdownRobot();
   }
 
-  private void requestRobotRestart() {
+  public void requestRobotRestart() {
     AppUtil.getInstance().showToast(UILocation.BOTH, AppUtil.getDefContext().getString(R.string.toastRestartingRobot));
     //
     RobotLog.clearGlobalErrorMsg();

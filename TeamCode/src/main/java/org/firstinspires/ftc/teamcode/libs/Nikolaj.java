@@ -16,9 +16,6 @@ public class Nikolaj {
         frMotor = hardwareMap.get(DcMotor.class, "fr");
         rlMotor = hardwareMap.get(DcMotor.class, "rl");
         rrMotor = hardwareMap.get(DcMotor.class, "rr");
-
-        flMotor.setDirection(REVERSE);
-        rrMotor.setDirection(REVERSE);
     }
 
     public DcMotor flMotor() { return this.flMotor; }

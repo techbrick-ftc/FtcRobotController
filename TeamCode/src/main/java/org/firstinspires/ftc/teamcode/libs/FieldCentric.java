@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -27,7 +28,7 @@ public class FieldCentric {
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private TelemetryPacket packet = new TelemetryPacket();
 
-    public void setUp(DcMotor[] motors, double[] wheelAngles) {
+    public void setUp(DcMotor[] motors, double[] wheelAngles, HardwareMap hardwareMap) {
         // Check if we have angles for every motor, and vice versa
         if (motors.length != wheelAngles.length) {
             throw new RuntimeException("Motor and wheelAngle arrays do not have same length.\nCheck your code!!!");
@@ -36,9 +37,9 @@ public class FieldCentric {
         this.motors = motors;
         this.wheelAngles = wheelAngles;
         this.wheelPowers = new double[motors.length];
-        // TODO: initialize imu before calling angle();
-        this.offset = angle();
+        Globals.setupIMU(hardwareMap);
         this.imu = getImu();
+        this.offset = angle();
     }
 
     public void resetAngle() {

@@ -43,6 +43,7 @@ public class Globals {
             imu = hardwareMap.get(BNO055IMU.class, "imu");
             BNO055IMU.Parameters params = new BNO055IMU.Parameters();
             imu.initialize(params);
+            System.out.println("Setup IMU");
         }
     }
 

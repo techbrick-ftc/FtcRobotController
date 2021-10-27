@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.mains;
 
 import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.libs.Globals.setupIMU;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
 
-@TeleOp(name="",group="")
+@TeleOp(name="Main",group="")
 public class FieldCentricDriving extends LinearOpMode {
     // Pre-init
     private final Nikolaj robot = new Nikolaj();
@@ -19,21 +19,27 @@ public class FieldCentricDriving extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Init
-        setupIMU(hardwareMap);
         robot.setup(hardwareMap);
         drive.setUp(
             new DcMotor[]{robot.frMotor(), robot.rrMotor(), robot.rlMotor(), robot.flMotor()},
-            new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4}
+            new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4},
+            hardwareMap
         );
     
         waitForStart();
     
         // Pre-run
-    
+        Gamepad cp1 = new Gamepad();
         while (opModeIsActive()) {
             // TeleOp loop
             drive.gyro();
-            drive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
+            drive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+
+            if (gamepad1.back && !cp1.back) { drive.resetAngle(); }
+
+            try {
+                cp1.copy(gamepad1);
+            } catch (Exception ignored) {}
         }
     }
 }
