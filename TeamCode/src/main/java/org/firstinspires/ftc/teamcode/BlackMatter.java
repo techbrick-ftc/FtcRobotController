@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
-
+// 10700
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -45,7 +45,30 @@ public class BlackMatter extends LinearOpMode {
 
     }
     public void arm(double rx, boolean degree) {
-        ar.setPower(gamepad1.left_stick_x);
+        if (degree) {
+            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if (rx == 360){
+                if (ar.getCurrentPosition() >= 180 * 10528 / 360) {
+                    ar.setTargetPosition((int)(360 * 10528 / 360));
+                }
+                else if (ar.getCurrentPosition() < 180 * 10528 / 360) {
+                    ar.setTargetPosition(0);
+                }
+            }
+            else {
+                ar.setTargetPosition((int)(rx * 10528 / 360));
+            }
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ar.setPower(1);
+        }
+        else {
+            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            ar.setTargetPosition((int)(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI)));
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
+            telemetry.addLine("" + Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI));
+            telemetry.update();
+        }
     }
     public void autorun(double x, double y) {
         while (autorunning && opModeIsActive()) {
@@ -84,6 +107,7 @@ public class BlackMatter extends LinearOpMode {
         double turningspeed = 1;
         Gamepad cp1 = new Gamepad();
         ElapsedTime timer1 = new ElapsedTime();
+        ElapsedTime timer2 = new ElapsedTime();
         while (opModeIsActive()) {
             Globals.getImu().getPosition();
             double y2 = -gamepad1.left_stick_y;
@@ -102,9 +126,11 @@ public class BlackMatter extends LinearOpMode {
             if (gamepad2.y) {
                 motor = 4;
             }
-            arm(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x), false);
+            if (gamepad2.left_stick_x > 0.1 || gamepad1.right_stick_y > 0.1) {
+                arm(0, false);
+            }
             if (gamepad2.dpad_up) {
-                arm(0, true);
+                arm(360, true);
             }
             if (gamepad2.dpad_right) {
                 arm(90, true);
@@ -139,11 +165,23 @@ public class BlackMatter extends LinearOpMode {
                 if (driveSpeed == 0) {
                     driveSpeed = 0.25;
                 }
+                timer2.reset();
+                while (gamepad1.right_trigger > 0.5) {
+                    if (timer2.seconds() > 1) {
+                        driveSpeed = 0.25;
+                    }
+                }
             }
             if (gamepad1.right_trigger > 0.5 && cp1.right_trigger <= 0.5) {
                 driveSpeed += 0.25;
                 if (driveSpeed == 1.25) {
                     driveSpeed = 1.00;
+                }
+                timer2.reset();
+                while (gamepad1.right_trigger > 0.5) {
+                    if (timer2.seconds() > 1) {
+                        driveSpeed = 1;
+                    }
                 }
             }
             if (gamepad1.a && !cp1.a) {
@@ -154,7 +192,7 @@ public class BlackMatter extends LinearOpMode {
                 timer1.reset();
                 while (gamepad1.a) {
                     if (timer1.seconds() > 1) {
-
+                        turningspeed = 1;
                     }
                 }
             }
