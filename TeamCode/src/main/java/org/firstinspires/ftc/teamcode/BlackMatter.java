@@ -45,29 +45,31 @@ public class BlackMatter extends LinearOpMode {
 
     }
     public void arm(double rx, boolean degree) {
-        if (degree) {
-            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            if (rx == 360){
-                if (ar.getCurrentPosition() >= 180 * 10528 / 360) {
-                    ar.setTargetPosition((int)(360 * 10528 / 360));
+        if (motor == 1) {
+            if (degree) {
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                if (rx == 360){
+                    if (ar.getCurrentPosition() >= 180 * 10528 / 360) {
+                        ar.setTargetPosition((int)(360 * 10528 / 360));
+                    }
+                    else if (ar.getCurrentPosition() < 180 * 10528 / 360) {
+                        ar.setTargetPosition(0);
+                    }
                 }
-                else if (ar.getCurrentPosition() < 180 * 10528 / 360) {
-                    ar.setTargetPosition(0);
+                else {
+                    ar.setTargetPosition((int)(rx * 10528 / 360));
                 }
+                ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                ar.setPower(1);
             }
             else {
-                ar.setTargetPosition((int)(rx * 10528 / 360));
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ar.setTargetPosition((int)(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI)));
+                ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
+                telemetry.addLine("" + Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI));
+                telemetry.update();
             }
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ar.setPower(1);
-        }
-        else {
-            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setTargetPosition((int)(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI)));
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
-            telemetry.addLine("" + Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI));
-            telemetry.update();
         }
     }
     public void autorun(double x, double y) {
