@@ -24,14 +24,12 @@ import org.firstinspires.ftc.teamcode.libs.SimpleSlamra;
 
 public class AutoImport extends LinearOpMode implements TeleAuto {
     // Defines vars
-    protected DcMotor m1 = null;
-    protected DcMotor m2 = null;
-    protected DcMotor m3 = null;
-    protected DcMotor m4 = null;
-    protected DcMotor arm = null;
-    protected DcMotor intake = null;
-    protected CRServo spinner = null;
-    protected Servo intakeHatch = null;
+    protected DcMotor fr = null;
+    protected DcMotor rr = null;
+    protected DcMotor rl = null;
+    protected DcMotor fl = null;
+    protected DcMotor armX = null;
+    protected DcMotor armY = null;
     //protected TouchSensor armTouch = null;
 
     protected SimpleSlamra slauto = new SimpleSlamra();
@@ -65,31 +63,29 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
 
     public void runOpMode() {
         // configures hardware
-        m4 = hardwareMap.get(DcMotor.class, "fl");
-        m1 = hardwareMap.get(DcMotor.class, "fr");
-        m3 = hardwareMap.get(DcMotor.class, "rl");
-        m2 = hardwareMap.get(DcMotor.class, "rr");
-        m1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        m2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        m3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        m4.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        m1.setDirection(DcMotor.Direction.REVERSE);
-        m4.setDirection(DcMotor.Direction.REVERSE);
+        fl = hardwareMap.get(DcMotor.class, "fl");
+        fr = hardwareMap.get(DcMotor.class, "fr");
+        rl = hardwareMap.get(DcMotor.class, "rl");
+        rr = hardwareMap.get(DcMotor.class, "rr");
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fr.setDirection(DcMotor.Direction.REVERSE);
+        fl.setDirection(DcMotor.Direction.REVERSE);
 
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        spinner = hardwareMap.get(CRServo.class, "spinner");
-        intakeHatch = hardwareMap.get(Servo.class, "intakeHatch");
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armX = hardwareMap.get(DcMotor.class, "armX");
+        armX.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //armX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armY = hardwareMap.get(DcMotor.class, "armY");
+        armY.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //armTouch = hardwareMap.get(TouchSensor.class, "armTouch");
+
+        //armBoundaryMin = hardwareMap.get(TouchSensor.class, "armBoundaryMin");
+        //armBoundaryMax = hardwareMap.get(TouchSensor.class, "armBoundaryMax");
 
         // initializes imu
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters param = new BNO055IMU.Parameters();
-        param.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        param.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(param);
+        setupIMU(hardwareMap);
 
         telemetry.addLine("IMU Done");
         telemetry.update();
@@ -117,40 +113,29 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
 
         camera.startDetection();
 
-        // loops this until start is pressed
         while (!isStarted()) {
-            activePosition = elementPosition(0, camera);
+            // loops this until start is pressed
             packet.put("Position", activePosition);
             dashboard.sendTelemetryPacket(packet);
-            telemetry.addData("Position", activePosition);
+            telemetry.addData("Position", elementPosition(0));
             telemetry.update();
         }
-        camera.stopDetection();
+        //camera.stopDetection();
 
         // passes hardware to slamra class
-        DcMotor[] motors = {m1, m2, m3, m4};
+        DcMotor[] motors = {fr, rr, rl, fl};
         slauto.setUp(motors, telemetry);
 
         packet.addLine("program started");
         dashboard.sendTelemetryPacket(packet);
     }
 
-    // you can make functions in here to use in auto programs
+    // make functions in here to use in auto programs
 
     // Function which uses the webcam to return the team element's position
-    // there is definitely a more efficient way to do this
-    public int elementPosition(long delay, EasyOpenCVImportable camera) {
-        int position = 0;
+    public int elementPosition(long delay) {
         sleep(delay);
-        EasyOpenCVImportable.Position rings = camera.getDetection();
-        if (rings.equals(EasyOpenCVImportable.Position.TWO)) {
-            position = 2;
-        } else if (rings.equals(EasyOpenCVImportable.Position.ONE)) {
-            position = 1;
-        } else if (rings.equals(EasyOpenCVImportable.Position.ZERO)) {
-            position = 0;
-        }
-        return position;
+        return camera.getDetection();
     }
 
     // Function which sets encoder values to 0, and waits until they have reset

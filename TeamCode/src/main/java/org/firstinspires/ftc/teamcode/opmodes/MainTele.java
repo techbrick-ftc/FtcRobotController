@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,10 +11,10 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 
-@TeleOp(name="BasicTele", group="generic")
-public class BasicTele extends AutoImport {
+@TeleOp(name="MainTele", group="generic")
+public class MainTele extends AutoImport {
 
-    public BasicTele() { super(31, -56, 225, 150, 255, 150); }
+    public MainTele() { super(31, -56, 225, 150, 255, 150); }
     FieldCentric drive = new FieldCentric();
     public boolean driverAbort() {
         return gamepad1.y;
@@ -32,7 +32,7 @@ public class BasicTele extends AutoImport {
 
         // Defines motor configs
         final double PI = Math.PI;
-        DcMotor[] motors = {m1, m2, m3, m4};
+        DcMotor[] motors = {fr, rr, rl, fl};
         double[] motorAngles = {3*PI/4, 5*PI/4, 7*PI/4, PI/4};
 
         // Sets up motor configs
@@ -54,9 +54,10 @@ public class BasicTele extends AutoImport {
         boolean isSpinningForth = false;
         boolean isSpinningBack = false;
         boolean hatchOpen = false;
+        double armXMin = -0.5;
+        double armXMax = 0.5;
 
-        // Starting servo positions
-        intakeHatch.setPosition(-1);
+        // Starting servo & motor positions
 
         waitForStart();
     
@@ -75,28 +76,22 @@ public class BasicTele extends AutoImport {
             drive.Drive(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
 
             // Controls arm
-            double armPower = Range.clip(-gamepad2.left_stick_y, -0.5, 0.5);
-            arm.setPower(armPower);
-
-            // Controls intake
-            if (gamepad2.right_trigger > 0.1) {
-                intake.setPower(-1);
-            } else if (gamepad2.left_trigger > 0.1) {
-                intake.setPower(1);
+            // Enforces encoder barriers at 90 and -90 degrees of starting position
+            if (armX.getCurrentPosition() >= 356) { // constant is 1/4 of full encoder rotation
+                armXMax = 0;
+            } else if (armX.getCurrentPosition() <= -356) {
+                armXMin = 0;
             } else {
-                intake.setPower(0);
+                armXMax = 0.5;
+                armXMin = -0.5;
             }
 
-            // Controls intake hatch
-            if (!hatchOpen && cur2.b && !prev2.b) {
-                intakeHatch.setPosition(1);
-                hatchOpen = true;
-            } else if (hatchOpen && cur2.b && !prev2.b) {
-                intakeHatch.setPosition(-1);
-                hatchOpen = false;
-            }
+            double armYPower = Range.clip(-gamepad2.left_stick_y, -0.5, 0.5);
+            armY.setPower(armYPower);
+            double armXPower = Range.clip(-gamepad2.left_stick_x, armXMin, armXMax);
+            armX.setPower(armXPower);
 
-            // Toggles spinner
+            /*// Toggles spinner
             if (!isSpinningForth && cur2.a && !prev2.a) {
                 spinner.setPower(1);
                 isSpinningForth = true;
@@ -107,7 +102,7 @@ public class BasicTele extends AutoImport {
                 spinner.setPower(0);
                 isSpinningForth = false;
                 isSpinningBack = false;
-            }
+            }*/
 
             // Reset Field Centric button
             if (cur1.a && !prev1.a) {
@@ -126,10 +121,10 @@ public class BasicTele extends AutoImport {
 
             // Send FTC Dashboard Packets
             packet.put("loop count", loops);
-            packet.put("fr power", m1.getPower());
-            packet.put("fl power", m4.getPower());
-            packet.put("rr power", m2.getPower());
-            packet.put("rl power", m3.getPower());
+            packet.put("fr power", fr.getPower());
+            packet.put("fl power", fl.getPower());
+            packet.put("rr power", rr.getPower());
+            packet.put("rl power", rl.getPower());
             dashboard.sendTelemetryPacket(packet);
 
             loops++;

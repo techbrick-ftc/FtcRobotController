@@ -105,17 +105,13 @@ public class EasyOpenCVImportable {
 
     public OpenCvInternalCamera getPhoneCamera() { return this.phoneCamera; }
 
-    public Position getDetection() { return this.pipeline.number; }
+    public int getDetection() { return this.pipeline.position; }
 
     public boolean getDetecting() { return this.detecting; }
 
-    public enum Position {
-        ZERO,
-        ONE,
-        TWO
-    }
+    public int getAnalysis1() { return this.pipeline.avg1; }
 
-    public int getAnalysis() { return this.pipeline.avg1; }
+    public int getAnalysis2() { return this.pipeline.avg2; }
 
     private static class UltimateGoalDetectionPipeline extends OpenCvPipeline {
 
@@ -131,7 +127,7 @@ public class EasyOpenCVImportable {
         static final int REGION_WIDTH = width;
         static final int REGION_HEIGHT = height;
 
-        final int ELEMENT_THRESHOLD = 160; // CHANGE THIS LATER
+        final int ELEMENT_THRESHOLD = 70; // USE THIS TO CHANGE THE MAXIMUM AVG VALUE FOR DETECTION
 
         Point region1_pointA = new Point(
                 REGION1_TOPLEFT_ANCHOR_POINT.x,
@@ -156,7 +152,7 @@ public class EasyOpenCVImportable {
         int avg2;
 
         // Volatile since accessed by OpMode w/o synchronization
-        private volatile Position number = Position.TWO;
+        private volatile int position = 2;
 
         /*
             This take the RGB frame and converts it to YCrCb,
@@ -192,13 +188,12 @@ public class EasyOpenCVImportable {
                     region2_pointB,
                     BLUE, 2);
 
-            number = Position.TWO;
-            if (avg1 > ELEMENT_THRESHOLD) {
-                number = Position.ZERO;
-            } else if (avg2 > ELEMENT_THRESHOLD) {
-                number = Position.ONE;
+            if (avg1 < ELEMENT_THRESHOLD) {
+                position = 0;
+            } else if (avg2 < ELEMENT_THRESHOLD) {
+                position = 1;
             } else {
-                number = Position.TWO;
+                position = 2;
             }
 
             Imgproc.rectangle(

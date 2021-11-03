@@ -28,7 +28,7 @@ public class Globals {
     public static void setupCamera(HardwareMap hardwareMap) {
         System.out.println("***setting up t265");
         if (camera == null) {
-            camera = new T265Camera(new Transform2d(new Translation2d(-7, -2), new Rotation2d(0)), 0.1, hardwareMap.appContext);
+            camera = new T265Camera(new Transform2d(new Translation2d(7 * 0.0254, 2 * 0.0254), new Rotation2d(0)), 0.1, hardwareMap.appContext);
             System.out.println("***finished setting up t265");
         }
     }

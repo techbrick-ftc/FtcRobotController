@@ -108,8 +108,8 @@ public class SimpleSlamra {
             double rotatedX = diffX * Math.cos(-currentRadian) - diffY * Math.sin(-currentRadian);
             double rotatedY = diffY * Math.cos(currentRadian) - diffX * Math.sin(currentRadian);
 
-            // Calculates individual wheel powers, based on the above values and how much it needs
-            // to rotate
+            // Calculates individual wheel powers, based on the above values
+            // diffAngle is divided by a value so that it has less of an effect on wheel power
             flPower = rotatedY + rotatedX - (diffAngle / 6);
             rlPower = rotatedY - rotatedX - (diffAngle / 6);
             frPower = rotatedY - rotatedX + (diffAngle / 6);
@@ -151,18 +151,6 @@ public class SimpleSlamra {
             // Updates all telemetries
             telemetryUpdate(currentX, currentY, diffX, diffY, newSpeed);
             dashUpdate(currentX, currentY, diffX, diffY, newSpeed);
-
-            TelemetryPacket robotPosition = new TelemetryPacket();
-            Canvas field = robotPosition.fieldOverlay();
-            final int robotRadius = 9;
-
-            field.strokeCircle(-currentY, currentX, robotRadius);
-            double arrowX = rotation.getCos() * robotRadius, arrowY = rotation.getSin() * robotRadius;
-            double x1 = -currentY + arrowX  / 2, y1 = currentX + arrowY / 2;
-            double x2 = -currentY + arrowX, y2 = currentX + arrowY;
-            field.strokeLine(x1, y1, x2, y2);
-
-            dashboard.sendTelemetryPacket(robotPosition);
 
             System.out.println("Current X: " + currentX + "\nCurrent Y: " + currentY + "\nDiff X: " + diffX + "\nDiff Y: " + diffY + "\nCurrent Radian: " + currentRadian + "\nCurrent Degree: " + currentDegree + "\nDiff Angle: " + diffAngle + "\nConfidence: " + confidence + "\nSlamra Rotate: " + rotation + "\nNew Speed: " + newSpeed + "\nDiff Avg: " + diffAvg + "\nMotor 1 Power: " + motors[0].getPower() + "\nMotor 2 Power: " + motors[1].getPower() + "\nMotor 3 Power: " + motors[2].getPower() + "\nMotor 4 Power: " + motors[3].getPower() + "\nflPower: " + flPower + "\nfrPower: " + frPower + "\nrlPower: " + rlPower + "\nrrPower: " + rrPower);
             System.out.println("-");
@@ -241,6 +229,7 @@ public class SimpleSlamra {
 
     private void dashUpdate(double currentX, double currentY, double diffX, double diffY, double newSpeed) {
         TelemetryPacket packet = new TelemetryPacket();
+        packet.put("confidence", confidence);
         packet.put("currentX", currentX);
         packet.put("currentY", currentY);
         packet.put("diffX", diffX);
@@ -251,6 +240,15 @@ public class SimpleSlamra {
         packet.put("m2 power", motors[1].getPower());
         packet.put("m3 power", motors[2].getPower());
         packet.put("m4 power", motors[3].getPower());
+
+        Canvas field = packet.fieldOverlay();
+        final int robotRadius = 9;
+        field.strokeCircle(-currentY, currentX, robotRadius);
+        double arrowX = rotation.getCos() * robotRadius, arrowY = rotation.getSin() * robotRadius;
+        double x1 = -currentY + arrowX  / 2, y1 = currentX + arrowY / 2;
+        double x2 = -currentY + arrowX, y2 = currentX + arrowY;
+        field.strokeLine(x1, y1, x2, y2);
+
         dashboard.sendTelemetryPacket(packet);
     }
 
