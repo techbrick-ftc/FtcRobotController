@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 
-@TeleOp(name="MainTele", group="generic")
+@TeleOp(name="MainTele", group="teleop")
 public class MainTele extends AutoImport {
 
     public MainTele() { super(31, -56, 225, 150, 255, 150); }
@@ -77,7 +77,7 @@ public class MainTele extends AutoImport {
 
             // Controls arm
             // Enforces encoder barriers at 90 and -90 degrees of starting position
-            if (armX.getCurrentPosition() >= 356) { // constant is 1/4 of full encoder rotation
+            /*if (armX.getCurrentPosition() >= 356) { // constant is 1/4 of full encoder rotation
                 armXMax = 0;
             } else if (armX.getCurrentPosition() <= -356) {
                 armXMin = 0;
@@ -89,9 +89,9 @@ public class MainTele extends AutoImport {
             double armYPower = Range.clip(-gamepad2.left_stick_y, -0.5, 0.5);
             armY.setPower(armYPower);
             double armXPower = Range.clip(-gamepad2.left_stick_x, armXMin, armXMax);
-            armX.setPower(armXPower);
+            armX.setPower(armXPower);*/
 
-            /*// Toggles spinner
+            // Toggles spinner
             if (!isSpinningForth && cur2.a && !prev2.a) {
                 spinner.setPower(1);
                 isSpinningForth = true;
@@ -102,7 +102,7 @@ public class MainTele extends AutoImport {
                 spinner.setPower(0);
                 isSpinningForth = false;
                 isSpinningBack = false;
-            }*/
+            }
 
             // Reset Field Centric button
             if (cur1.a && !prev1.a) {

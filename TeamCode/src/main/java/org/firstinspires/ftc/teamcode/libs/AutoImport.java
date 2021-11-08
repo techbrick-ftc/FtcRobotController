@@ -28,9 +28,12 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
     protected DcMotor rr = null;
     protected DcMotor rl = null;
     protected DcMotor fl = null;
-    protected DcMotor armX = null;
-    protected DcMotor armY = null;
-    //protected TouchSensor armTouch = null;
+    //protected DcMotor armX = null;
+    //protected DcMotor armY = null;
+    protected CRServo spinner = null;
+
+    //protected TouchSensor armBoundryMin = null;
+    //protected TouchSensor armBoundryMax = null;
 
     protected SimpleSlamra slauto = new SimpleSlamra();
     protected EasyOpenCVImportable camera = new EasyOpenCVImportable();
@@ -74,28 +77,33 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         fr.setDirection(DcMotor.Direction.REVERSE);
         fl.setDirection(DcMotor.Direction.REVERSE);
 
-        armX = hardwareMap.get(DcMotor.class, "armX");
+        /*armX = hardwareMap.get(DcMotor.class, "armX");
         armX.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //armX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armY = hardwareMap.get(DcMotor.class, "armY");
-        armY.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armY.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+
+        spinner = hardwareMap.get(CRServo.class, "spinner");
 
 
         //armBoundaryMin = hardwareMap.get(TouchSensor.class, "armBoundaryMin");
         //armBoundaryMax = hardwareMap.get(TouchSensor.class, "armBoundaryMax");
 
         // initializes imu
-        setupIMU(hardwareMap);
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters params = new BNO055IMU.Parameters();
+        imu.initialize(params);
 
         telemetry.addLine("IMU Done");
         telemetry.update();
 
         // initializes easyopencv
         // width and height of vision box are hardcoded here
-        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, camera1X, camera1Y, camera2X, camera2Y, 45, 18);
+        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, camera1X, camera1Y, camera2X, camera2Y, 18, 45);
 
         // initializes slamra
-        setupCamera(hardwareMap);
+        Pose2d startingPose = new Pose2d(new Translation2d(startingPoseX * 0.0254, startingPoseY * 0.0254), new Rotation2d(0));
+        setupCamera(hardwareMap, startingPose);
         sleep(5000);
         startCamera();
 

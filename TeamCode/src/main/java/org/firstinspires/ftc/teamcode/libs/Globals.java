@@ -25,10 +25,11 @@ public class Globals {
     private static T265Camera camera;
     private static BNO055IMU imu;
 
-    public static void setupCamera(HardwareMap hardwareMap) {
+    public static void setupCamera(HardwareMap hardwareMap, Pose2d pose2d) {
         System.out.println("***setting up t265");
         if (camera == null) {
-            camera = new T265Camera(new Transform2d(new Translation2d(7 * 0.0254, 2 * 0.0254), new Rotation2d(0)), 0.1, hardwareMap.appContext);
+            camera = new T265Camera(new Transform2d(new Translation2d(4.8 * 0.0254, -5.5 * 0.0254), new Rotation2d(0)), 0.1, hardwareMap.appContext);
+            camera.setPose(pose2d);
             System.out.println("***finished setting up t265");
         }
     }

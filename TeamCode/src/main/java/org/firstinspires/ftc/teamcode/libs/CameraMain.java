@@ -54,7 +54,8 @@ public class CameraMain {
         setupIMU(hardwareMap);
         this.imu = getImu();
         this.orientationModifier = orientationModifiers;
-        setupCamera(hardwareMap);
+        Pose2d startingPose = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
+        setupCamera(hardwareMap, startingPose);
         this.camera = getCamera();
         this.axesReference = axesReference;
         this.telemetry = telemetry;

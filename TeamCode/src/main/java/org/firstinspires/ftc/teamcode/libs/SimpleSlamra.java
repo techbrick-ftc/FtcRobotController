@@ -150,7 +150,7 @@ public class SimpleSlamra {
 
             // Updates all telemetries
             telemetryUpdate(currentX, currentY, diffX, diffY, newSpeed);
-            dashUpdate(currentX, currentY, diffX, diffY, newSpeed);
+            dashUpdate(currentX, currentY, diffX, diffY, diffAngle, newSpeed);
 
             System.out.println("Current X: " + currentX + "\nCurrent Y: " + currentY + "\nDiff X: " + diffX + "\nDiff Y: " + diffY + "\nCurrent Radian: " + currentRadian + "\nCurrent Degree: " + currentDegree + "\nDiff Angle: " + diffAngle + "\nConfidence: " + confidence + "\nSlamra Rotate: " + rotation + "\nNew Speed: " + newSpeed + "\nDiff Avg: " + diffAvg + "\nMotor 1 Power: " + motors[0].getPower() + "\nMotor 2 Power: " + motors[1].getPower() + "\nMotor 3 Power: " + motors[2].getPower() + "\nMotor 4 Power: " + motors[3].getPower() + "\nflPower: " + flPower + "\nfrPower: " + frPower + "\nrlPower: " + rlPower + "\nrrPower: " + rrPower);
             System.out.println("-");
@@ -174,8 +174,9 @@ public class SimpleSlamra {
         Translation2d pose = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
 
         // Saves the robot's current position
-        currentX = -pose.getY();
-        currentY = pose.getX();
+        currentX = -pose.getX(); // The order of x and y, and the negation is determined by the
+        currentY = -pose.getY(); // orientation of the t265 to the front of the robot, defined by
+                                 // the wheels. Play with these values until it works.
         rotation = up.pose.getRotation();
         confidence = up.confidence;
 
@@ -227,7 +228,7 @@ public class SimpleSlamra {
         telemetry.update();
     }
 
-    private void dashUpdate(double currentX, double currentY, double diffX, double diffY, double newSpeed) {
+    private void dashUpdate(double currentX, double currentY, double diffX, double diffY, double diffAngle, double newSpeed) {
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("confidence", confidence);
         packet.put("currentX", currentX);
@@ -236,6 +237,7 @@ public class SimpleSlamra {
         packet.put("diffY", diffY);
         packet.put("angle (degrees)", currentDegree);
         packet.put("angle (radians)", currentRadian);
+        packet.put("diff angle", diffAngle);
         packet.put("m1 power", motors[0].getPower());
         packet.put("m2 power", motors[1].getPower());
         packet.put("m3 power", motors[2].getPower());
