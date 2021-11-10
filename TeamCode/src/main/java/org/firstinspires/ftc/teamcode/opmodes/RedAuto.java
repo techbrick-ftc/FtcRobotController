@@ -16,7 +16,7 @@ public class RedAuto extends AutoImport {
 
         if (opModeIsActive()) {
             slauto.drive(55, -60, -90, 0.75, this);
-            doSpinny(true, 2);
+            doSpinny(true, 2000);
 
             stopCamera();
         }
