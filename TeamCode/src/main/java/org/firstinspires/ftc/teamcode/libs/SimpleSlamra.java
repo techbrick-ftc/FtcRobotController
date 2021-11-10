@@ -7,7 +7,6 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -174,15 +173,15 @@ public class SimpleSlamra {
         Translation2d pose = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
 
         // Saves the robot's current position
-        currentX = -pose.getX(); // The order of x and y, and the negation is determined by the
-        currentY = -pose.getY(); // orientation of the t265 to the front of the robot, defined by
-                                 // the wheels. Play with these values until it works.
+        currentX = -pose.getX();
+        currentY = -pose.getY();
+
         rotation = up.pose.getRotation();
         confidence = up.confidence;
 
         // Saves the robot's current position
-        currentRadian = rotation.getRadians();
-        currentDegree = rotation.getDegrees();
+        currentRadian = /*rotation.getRadians();*/ getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+        currentDegree = /*rotation.getDegrees();*/ getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
         return true;
     }
@@ -243,12 +242,13 @@ public class SimpleSlamra {
         packet.put("m3 power", motors[2].getPower());
         packet.put("m4 power", motors[3].getPower());
 
+        // Y is negated because digital y is special
         Canvas field = packet.fieldOverlay();
         final int robotRadius = 9;
-        field.strokeCircle(-currentY, currentX, robotRadius);
+        field.strokeCircle(currentX, -currentY, robotRadius);
         double arrowX = rotation.getCos() * robotRadius, arrowY = rotation.getSin() * robotRadius;
-        double x1 = -currentY + arrowX  / 2, y1 = currentX + arrowY / 2;
-        double x2 = -currentY + arrowX, y2 = currentX + arrowY;
+        double x1 = currentX + arrowX  / 2, y1 = -currentY + arrowY / 2;
+        double x2 = currentX + arrowX, y2 = -currentY + arrowY;
         field.strokeLine(x1, y1, x2, y2);
 
         dashboard.sendTelemetryPacket(packet);

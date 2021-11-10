@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
+import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @TeleOp(name="MainTele", group="teleop")
 public class MainTele extends AutoImport {
@@ -37,7 +38,7 @@ public class MainTele extends AutoImport {
 
         // Sets up motor configs
         try {
-            drive.setUp(motors, motorAngles, imu);
+            drive.setUp(motors, motorAngles);
         } catch (Exception e) {
             packet.put("SETUP ERROR", true);
             dashboard.sendTelemetryPacket(packet);

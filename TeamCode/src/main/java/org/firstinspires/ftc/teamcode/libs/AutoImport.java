@@ -9,7 +9,6 @@ import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,7 +36,6 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
 
     protected SimpleSlamra slauto = new SimpleSlamra();
     protected EasyOpenCVImportable camera = new EasyOpenCVImportable();
-    protected BNO055IMU imu;
 
     protected FtcDashboard dashboard = FtcDashboard.getInstance();
     protected TelemetryPacket packet = new TelemetryPacket();
@@ -90,10 +88,7 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         //armBoundaryMax = hardwareMap.get(TouchSensor.class, "armBoundaryMax");
 
         // initializes imu
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters params = new BNO055IMU.Parameters();
-        imu.initialize(params);
-
+        setupIMU(hardwareMap);
         telemetry.addLine("IMU Done");
         telemetry.update();
 
@@ -138,7 +133,18 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         dashboard.sendTelemetryPacket(packet);
     }
 
-    // make functions in here to use in auto programs
+    // Function which pushes the robot spinner into the wall, before running it. True = red
+    public void doSpinny(boolean side, int timeout) {
+        if (side) { // red
+            slauto.drive(60, 60, -90, 0.5, timeout, this, false, false);
+            spinner.setPower(0.5);
+            sleep(5000);
+            spinner.setPower(0);
+
+        } else { // blue
+
+        }
+    }
 
     // Function which uses the webcam to return the team element's position
     public int elementPosition(long delay) {

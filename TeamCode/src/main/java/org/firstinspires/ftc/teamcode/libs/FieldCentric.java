@@ -1,10 +1,9 @@
 // This is the class that allows us to use field centric in teleop.
 
 package org.firstinspires.ftc.teamcode.libs;
+import static org.firstinspires.ftc.teamcode.libs.Globals.*;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -19,10 +18,9 @@ public class FieldCentric {
     private double theta;
     private double rotation = 0;
     private double currentAngle;
-    private BNO055IMU imu;
     private double offsetAngle = 0;
 
-    public void setUp(DcMotor[] motors, double[] wheelAngles, BNO055IMU imu) throws Exception {
+    public void setUp(DcMotor[] motors, double[] wheelAngles) throws Exception {
         // Check if we have angles for every motor, and vice versa
         if (motors.length != wheelAngles.length) {
             throw new java.lang.Exception("Motor and wheelAngle arrays do not have same length.\nCheck your code!!!");
@@ -30,7 +28,6 @@ public class FieldCentric {
 
         this.motors = motors;
         this.wheelAngles = wheelAngles;
-        this.imu = imu;
 
         getAngle();
         this.rotation = currentAngle;
@@ -43,7 +40,7 @@ public class FieldCentric {
     }
 
     private void getAngle() {
-        currentAngle = wrap(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle - offsetAngle);
+        currentAngle = wrap(getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle - offsetAngle);
     }
 
     /**
@@ -104,7 +101,7 @@ public class FieldCentric {
     }
 
     public void newOffset() {
-        offsetAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle - Math.PI/2;
+        offsetAngle = getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle - Math.PI/2;
     }
 
     private double wrap(double theta) {
