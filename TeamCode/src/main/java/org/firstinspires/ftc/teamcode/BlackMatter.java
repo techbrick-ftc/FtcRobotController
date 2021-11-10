@@ -117,10 +117,10 @@ public class BlackMatter extends LinearOpMode {
                 cs2.setPower(0);
             }
             if (gamepad2.dpad_up) {
-                ap.setPower(-0.4);
+                ap.setPower(-0.5);
             }
             else if (gamepad2.dpad_down) {
-                ap.setPower(0.2);
+                ap.setPower(0.4);
             }
             else {
                 ap.setPower(0);
