@@ -29,6 +29,7 @@ public class BlackMatter extends LinearOpMode {
     boolean autorunning = false;
     double angle = 0;
     double driveSpeed = 1.00;
+    boolean runningInput = false;
     public void drive(double x2, double y2, double rx) {
         double x = x2;
         double y = y2;
@@ -111,10 +112,20 @@ public class BlackMatter extends LinearOpMode {
             else if (!ts1.isPressed() && gamepad2.left_bumper) {
                 cs1.setPower(0.50);
                 cs2.setPower(-0.28);
+                runningInput = true;
             }
-            else {
+            else if (ts1.isPressed()) {
                 cs1.setPower(0);
                 cs2.setPower(0);
+                runningInput = false;
+            }
+            else {
+                cs1.setPower(0.50);
+                cs2.setPower(-0.28);
+            }
+            if (runningInput) {
+                cs1.setPower(0.50);
+                cs2.setPower(-0.28);
             }
             if (gamepad2.dpad_up) {
                 ap.setPower(-0.5);
