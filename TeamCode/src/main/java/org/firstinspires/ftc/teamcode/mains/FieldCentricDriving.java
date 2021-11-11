@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
 
@@ -27,13 +30,21 @@ public class FieldCentricDriving extends LinearOpMode {
         );
     
         waitForStart();
-    
+        AppUtil.getInstance().showToast(UILocation.BOTH, "Ethan's ego is bigger than the sun.");
+
         // Pre-run
         Gamepad cp1 = new Gamepad();
         while (opModeIsActive()) {
             // TeleOp loop
             drive.gyro();
-            drive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            drive.Drive(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+
+            if (robot.getLifter().getCurrentPosition() > -530 &&
+                robot.getLifter().getCurrentPosition() < 0) {
+                robot.getLifter().setPower(gamepad2.left_stick_y);
+            }
+
+            AppUtil.getInstance().getRootActivity().getActionBar().show();
 
             if (gamepad1.back && !cp1.back) { drive.resetAngle(); }
 
