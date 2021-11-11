@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 //535 tpr
-@TeleOp(name="AFK ANTIMATTER MACHINE")
+@Autonomous(name="AFK ANTIMATTER MACHINE")
 public class AFK_ANTIMATTER_MACHINE extends LinearOpMode {
     DcMotor fl;
     DcMotor fr;

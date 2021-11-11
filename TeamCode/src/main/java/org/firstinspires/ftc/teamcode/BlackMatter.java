@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 // 10700
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
+@Disabled
 @TeleOp(name="Black Matter")
 public class BlackMatter extends LinearOpMode {
     DcMotor fl;
@@ -51,12 +53,10 @@ public class BlackMatter extends LinearOpMode {
 
     }
     public void arm() {
-            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setTargetPosition((int)(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI)));
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
-            telemetry.addLine("" + Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI));
-            telemetry.update();
+        ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ar.setTargetPosition((int)(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI)));
+        ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
     }
     public void autorun(double x, double y) {
         while (autorunning && opModeIsActive()) {
@@ -105,11 +105,12 @@ public class BlackMatter extends LinearOpMode {
             double x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
             drive(x2, y2, rx);
-            if (gamepad2.left_trigger > 0.5) {
+            arm();
+            if (gamepad2.right_trigger > 0.5) {
                 cs1.setPower(-0.50);
                 cs2.setPower(0.28);
             }
-            else if (!ts1.isPressed() && gamepad2.left_bumper) {
+            else if (!ts1.isPressed() && gamepad2.right_bumper) {
                 cs1.setPower(0.50);
                 cs2.setPower(-0.28);
                 runningInput = true;
