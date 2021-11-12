@@ -12,7 +12,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
-
 @TeleOp(name="Dark Matter (◉_◉)")
 public class DarkMatter extends LinearOpMode {
     DcMotor fl;
@@ -24,8 +23,10 @@ public class DarkMatter extends LinearOpMode {
     CRServo cs1;
     CRServo cs2;
     TouchSensor ts1;
+    TouchSensor ts2;
     boolean autorunning = false;
     double angle = 0;
+    double apEncoderTicks = 0;
     double driveSpeed = 1.00;
     boolean runningInput = false;
     public void drive(double x2, double y2, double rx) {
@@ -49,10 +50,12 @@ public class DarkMatter extends LinearOpMode {
 
     }
     public void arm() {
-        ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ar.setTargetPosition((int)(Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) * 10528 / (2 * Math.PI)));
-        ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
+        if (gamepad2.left_stick_x > 0.1) {
+            ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
+        }
+        if (gamepad2.left_stick_x < 0.1) {
+            ar.setPower(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
+        }
     }
     public void autorun(double x, double y) {
         while (autorunning && opModeIsActive()) {
@@ -75,6 +78,7 @@ public class DarkMatter extends LinearOpMode {
         }
     }
     @Override
+
     public void runOpMode() {
         fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
@@ -85,6 +89,7 @@ public class DarkMatter extends LinearOpMode {
         cs1 = hardwareMap.get(CRServo.class, "cs1");
         cs2 = hardwareMap.get(CRServo.class, "cs2");
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
+        ts2 = hardwareMap.get(TouchSensor.class, "ts2");
         Globals.setupIMU(hardwareMap);
         telemetry.addLine("Injecting Dark Matter...");
         telemetry.update();
@@ -97,12 +102,59 @@ public class DarkMatter extends LinearOpMode {
         Gamepad cp1 = new Gamepad();
         Gamepad cp2 = new Gamepad();
         while (opModeIsActive()) {
+            telemetry.addData("CURRENT.POS", ap.getCurrentPosition());
+            telemetry.update();
             Globals.getImu().getPosition();
             double y2 = -gamepad1.left_stick_y;
             double x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
             drive(x2, y2, rx);
-            arm();
+            if (gamepad2.dpad_up) {
+                ap.setPower(-0.75);
+            }
+            else if (gamepad2.dpad_down) {
+                ap.setPower(0.65);
+            }
+            else {
+                ap.setPower(0);
+            }
+            if (gamepad2.a) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(0);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (Math.abs(ap.getCurrentPosition()) > 20) {
+                    ap.setPower(0.66);
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            else if (gamepad2.y) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(-3050);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (Math.abs(ap.getCurrentPosition()) < 3060 || Math.abs(ap.getCurrentPosition()) > 3040) {
+                    ap.setPower(-0.66);
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            else if (gamepad2.x) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(-2116);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (Math.abs(ap.getCurrentPosition()) < 2126 || Math.abs(ap.getCurrentPosition()) > 2106) {
+                    ap.setPower(-0.66);
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            else {
+                ap.setPower(0);
+            }
+            if (ts2.isPressed()) {
+                ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
             if (gamepad2.right_trigger > 0.5) {
                 cs1.setPower(-0.50);
                 cs2.setPower(0.35);
@@ -124,15 +176,7 @@ public class DarkMatter extends LinearOpMode {
                 cs1.setPower(0);
                 cs2.setPower(0);
             }
-            if (gamepad2.dpad_up) {
-                ap.setPower(-0.75);
-            }
-            else if (gamepad2.dpad_down) {
-                ap.setPower(0.65);
-            }
-            else {
-                ap.setPower(0);
-            }
+
             if (gamepad2.left_stick_x > 0.1 || gamepad1.right_stick_y > 0.1) {
                 arm();
             }
@@ -190,6 +234,7 @@ public class DarkMatter extends LinearOpMode {
                 cs1.setPower(0.50);
                 cs2.setPower(-0.35);
             }
+            arm();
         }
     }
 }

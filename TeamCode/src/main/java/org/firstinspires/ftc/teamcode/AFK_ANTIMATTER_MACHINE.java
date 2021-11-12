@@ -23,6 +23,7 @@ public class AFK_ANTIMATTER_MACHINE extends LinearOpMode {
     DcMotor fr;
     DcMotor rl;
     DcMotor rr;
+    DcMotor ap;
     final double ticksPerInch = 1000;
     public void afkdriveTURBO(double inX) {
         afkdriveSPEEDSET(inX, 1);
@@ -57,14 +58,12 @@ public class AFK_ANTIMATTER_MACHINE extends LinearOpMode {
         }
     }
     public void DEBUG() {
-        telemetry.addData("ENCODER.TICKS", fl.getCurrentPosition());
-        telemetry.addData("ENCODER.TICKS", fr.getCurrentPosition());
-        telemetry.addData("ENCODER.TICKS", rl.getCurrentPosition());
-        telemetry.addData("ENCODER.TICKS", rr.getCurrentPosition());
+        telemetry.addData("ENCODER.TICKS", ap.getCurrentPosition());
         telemetry.update();
     }
         @Override
     public void runOpMode() {
+        ap = hardwareMap.get(DcMotor.class, "ap");
         fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
