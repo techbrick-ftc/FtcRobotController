@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
+@Disabled
 @TeleOp(name="Antimatter BOSS")
 public class AntimatterBOSS extends LinearOpMode {
     DcMotor fl;
