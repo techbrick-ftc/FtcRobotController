@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode.libs;
-
 import android.content.Context;
 
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.spartronics4915.lib.T265Camera;
-
+import static java.lang.Math.*;
 /*
  * This file is made to be used in the CameraMain class so that the T265 camera and the internal
  * imu do not get instantiated more than once, because keeping them static means
@@ -27,6 +26,17 @@ public class Globals {
         if (camera == null) {
             camera = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
         }
+    }
+    public static double wrap(double input) {
+        while(abs(input) > 180) {
+            if(input < -180) {
+                input += 360;
+            }
+            else {
+                input -= 360;
+            }
+        }
+        return input;
     }
 
     public static void setupIMU(HardwareMap hardwareMap) {
