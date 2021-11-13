@@ -6,18 +6,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
-@TeleOp(name="Dark Matter 🙂")
+@TeleOp(name="Dark Matter (-_-)")
 public class DarkMatter extends LinearOpMode {
     //Global Variables
     DcMotorEx fl;
@@ -30,21 +26,11 @@ public class DarkMatter extends LinearOpMode {
     CRServo cs2;
     TouchSensor ts1;
     TouchSensor ts2;
-    Camera camera;
-    LED led;
     double angle = 0;
     double driveSpeed = 1.00;
     boolean runningInput = false;
-    boolean duckControl = false;
-    boolean pressed = false;
-    boolean fieldCentric = true;
-    boolean driveAllowed;
-    Gamepad cp1;
-    Gamepad cp2;
-    //
-    //FieldCentric Drive Control
-    //
-    public void fieldCentricDrive(double x2, double y2, double rx) {
+    //Custom drive function:
+    public void drive(double x2, double y2, double rx) {
         Orientation orientation = Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         double x = x2 * Math.cos(-(orientation.firstAngle - angle)) - y2 * Math.sin(-(orientation.firstAngle - angle));
         double y = y2 * Math.cos(-(orientation.firstAngle - angle)) - x2 * Math.sin(-(orientation.firstAngle - angle));
@@ -54,142 +40,45 @@ public class DarkMatter extends LinearOpMode {
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
 
-        fl.setVelocity((frontLeftPower * driveSpeed) * 1800);
-        rl.setVelocity((backLeftPower * driveSpeed) * 1800);
-        fr.setVelocity((frontRightPower * driveSpeed) * 1800);
-        rr.setVelocity((backRightPower * driveSpeed) * 1800);
-    }
-    //
-    //RobotCentric Drive Control
-    //
-    public void robotCentricDrive(double x2, double y2, double rx) {
-        double denominator = Math.max(Math.abs(y2) + Math.abs(x2) + Math.abs(rx), 1);
-        double frontLeftPower = (y2 + x2 + rx) / denominator;
-        double backLeftPower = (y2 - x2 + rx) / denominator;
-        double frontRightPower = (y2 - x2 - rx) / denominator;
-        double backRightPower = (y2 + x2 - rx) / denominator;
+        fl.setPower(frontLeftPower * driveSpeed);
+        rl.setPower(backLeftPower * driveSpeed);
+        fr.setPower(frontRightPower * driveSpeed);
+        rr.setPower(backRightPower * driveSpeed);
 
-        fl.setVelocity((frontLeftPower * driveSpeed) * 1800);
-        rl.setVelocity((backLeftPower * driveSpeed) * 1800);
-        fr.setVelocity((frontRightPower * driveSpeed) * 1800);
-        rr.setVelocity((backRightPower * driveSpeed) * 1800);
     }
-    //
-    //Arm Rotational Control
-    //
-    public void armRotation() {
-        double onx = gamepad2.right_stick_x;
-        double onx2 = gamepad2.left_stick_x;
-        if (onx > 0.3 && (ar.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ar.setVelocity(900);
+    //Test and Moves arm:
+    public void arm() {
+        if (gamepad2.left_stick_x > 0.1) {
+            ar.setPower(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
         }
-        else if (onx < -0.45 && ( ar.getCurrentPosition() > -9200 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ar.setVelocity(-900);
+        if (gamepad2.left_stick_x < -0.1) {
+            ar.setPower(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y));
         }
-        else if (onx2 > 0.3 && ar.getCurrentPosition() < 0) {
-            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 1500);
+        if (gamepad2.right_stick_x > 0.1) {
+            ar.setPower(0.3);
         }
-        else if (onx2 < -0.3 && ar.getCurrentPosition() > -9200) {
-            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 1500);
+        if (gamepad2.right_stick_x < -0.1) {
+            ar.setPower(-0.3);
         }
-        else {
-            ar.setVelocity(0);
-        }
-    }
-    //
-    //Arm Pitch Control
-    //
-    public void armPitch() {
-        //Arm up
-        if (gamepad2.left_bumper && (ap.getCurrentPosition() > -5650 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setVelocity(-1600);
-        }
-        //Arm down
-        else if (gamepad2.left_trigger > 0.4 && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setVelocity(1600);
-        }
-        //Checks if not busy
-        else if (!ap.isBusy()) {
-            ap.setVelocity(0);
-        }
-        //Position 0 (Intake)
-        if (gamepad2.a) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setTargetPosition(0);
-            ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ap.setVelocity(-1600);
-        }
-        //Position -3050 (Level 3 shipping hub)
-        else if (gamepad2.y) {
-//                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (gamepad2.left_stick_y > 0.1) {
             ap.setTargetPosition(-3050);
-            ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ap.setVelocity(-1600);
+            ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            ap.setPower(-Math.sqrt(gamepad2.left_stick_y * gamepad2.left_stick_y + gamepad2.left_stick_x * gamepad2.left_stick_x));
         }
-        //Position -2216 (Duck Position)
-        else if (gamepad2.x) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setTargetPosition(-2116);
-            ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ap.setVelocity(-1600);
+        if (gamepad2.left_stick_y < -0.1) {
+            ap.setTargetPosition(0);
+            ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            ap.setPower(Math.sqrt(gamepad2.left_stick_y * gamepad2.left_stick_y + gamepad2.left_stick_x * gamepad2.left_stick_x));
         }
-        //Position -705 (Shared shipping hub)
-        else if (gamepad2.b) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setTargetPosition(-705);
-            ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ap.setVelocity(-1600);
+        if (gamepad2.right_stick_y > 0.1) {
+            ap.setTargetPosition(-3050);
+            ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            ap.setPower(-0.3);
         }
-        //Checks if below bottom limit
-        if (ap.getCurrentPosition() > 0 && !gamepad2.left_stick_button && !gamepad2.right_stick_button) {
-            if (ap.getCurrentPosition() > -100) {
-                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                ap.setVelocity(-1000);
-            }
-        }
-    }
-    //
-    //Input Output Servos Control
-    //
-    public void inputOutputControl() {
-        //Duck Spin
-        if (gamepad2.guide && !cp2.guide) {
-            cs1.setPower(-1);
-            duckControl = !duckControl;
-        }
-        //Runs servos to output item
-        if (gamepad2.right_trigger > 0.5) {
-            cs1.setPower(-0.55);
-            cs2.setPower(0.35);
-        }
-        //Runs servos to input item
-        else if (!ts1.isPressed() && gamepad2.right_bumper && !cp2.right_bumper) {
-            cs1.setPower(0.50);
-            cs2.setPower(-0.35);
-            runningInput = !runningInput;
-        }
-        //If item presses button or arm driver presses right trigger
-        else if (ts1.isPressed() || gamepad2.right_trigger > 0.2) {
-            cs1.setPower(-0.50);
-            cs2.setPower(0.35);
-            runningInput = false;
-            sleep(3);
-            cs1.setPower(0);
-            cs2.setPower(0);
-        }
-        // If none, sets power to 0
-        else if (!runningInput) {
-            cs1.setPower(0);
-            cs2.setPower(0);
-        }        //Runs servos to input item
-        if (runningInput) {
-            cs1.setPower(0.50);
-            cs2.setPower(-0.35);
-        }
-        if (duckControl) {
-            cs1.setPower(-1);
+        if (gamepad2.right_stick_y < -0.1) {
+            ap.setTargetPosition(0);
+            ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            ap.setPower(0.3);
         }
     }
     @Override
@@ -206,7 +95,6 @@ public class DarkMatter extends LinearOpMode {
         cs2 = hardwareMap.get(CRServo.class, "cs2");
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         ts2 = hardwareMap.get(TouchSensor.class, "ts2");
-        ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Globals.setupIMU(hardwareMap);
         telemetry.addLine("Injecting Dark Matter...");
         telemetry.update();
@@ -217,109 +105,190 @@ public class DarkMatter extends LinearOpMode {
         telemetry.update();
         fl.setDirection(DcMotorSimple.Direction.REVERSE); rl.setDirection(DcMotorSimple.Direction.REVERSE);
         double turningspeed = 1;
-        cp1 = new Gamepad();
-        cp2 = new Gamepad();
-        ElapsedTime timer1 = new ElapsedTime();
+        Gamepad cp1 = new Gamepad();
+        Gamepad cp2 = new Gamepad();
         //While loop for OpMode
         while (opModeIsActive()) {
+            //Checks if the arm is past boundaries
+            if (ap.getCurrentPosition() < -5650) {
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                while (ap.getCurrentPosition() < -5500) {
+                    ap.setPower(0.6);
+                }
+                ap.setPower(0);
+            }
             //Updates and drives
             Globals.getImu().getPosition();
             double y2 = -gamepad1.left_stick_y;
             double x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
-            driveAllowed = y2 > 0.2 || x2 > 0.2 || rx > 0.2 || y2 < -0.2 || x2 < -0.2 || rx < -0.2;
-            if (driveAllowed) {
-                if (fieldCentric) {
-                    fieldCentricDrive(x2, y2, rx);
+            drive(x2, y2, rx);
+            //Turns 90 degrees Counterclockwise
+            if (gamepad1.left_bumper) {
+                double current = Globals.getImu().getAngularOrientation().firstAngle;
+                while (Globals.getImu().getAngularOrientation().firstAngle < Globals.wrap(current - 90)) {
+                    fl.setPower(-0.5);
+                    fr.setPower(-0.5);
+                    rl.setPower(0.5);
+                    rr.setPower(0.5);
                 }
-                else {
-                    robotCentricDrive(x2, y2, rx);
-                }
+                fl.setPower(0);
+                fr.setPower(0);
+                rl.setPower(0);
+                rr.setPower(0);
             }
-            //Calibrate pitch
-            if (gamepad2.back) {
+            //Turns 90 degrees Clockwise
+            if (gamepad1.right_bumper) {
+                double current = Globals.getImu().getAngularOrientation().firstAngle;
+                while (Globals.getImu().getAngularOrientation().firstAngle < Globals.wrap(current + 90)) {
+                    fl.setPower(0.5);
+                    fr.setPower(0.5);
+                    rl.setPower(-0.5);
+                    rr.setPower(-0.5);
+                }
+                fl.setPower(0);
+                fr.setPower(0);
+                rl.setPower(0);
+                rr.setPower(0);
+            }
+            //Arm up
+            if (gamepad2.left_bumper) {
+                ap.setTargetPosition(-3050);
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(-0.8);
+            }
+            //Arm down
+            else if (gamepad2.left_trigger > 0.4) {
+                ap.setTargetPosition(0);
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0.8);
+            }
+            //Disables arm movement up or down
+            else {
+                ap.setPower(0);
+            }
+            //Position 0 (Intake)
+            if (gamepad2.a) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(0);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (Math.abs(ap.getCurrentPosition()) > 10) {
+                    ap.setPower(-0.8);
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            //Position -3050 (Level 3 shipping hub)
+            if (gamepad2.y) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(-3050);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                if (Math.abs(ap.getCurrentPosition()) < 3040) {
+                    while (Math.abs(ap.getCurrentPosition()) < 3040 && opModeIsActive()) {
+                        ap.setPower(-0.8);
+                    }
+                }
+                else if (Math.abs(ap.getCurrentPosition()) > 3060) {
+                    while (Math.abs(ap.getCurrentPosition()) > 3060 && opModeIsActive()) {
+                        ap.setPower(0.8);
+                    }
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            //Position -2216 (Duck Position)
+            if (gamepad2.x) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(-2116);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                if (Math.abs(ap.getCurrentPosition()) < 2106) {
+                    while (Math.abs(ap.getCurrentPosition()) < 2106 && opModeIsActive()) {
+                        ap.setPower(-0.8);
+                    }
+                }
+                else if (Math.abs(ap.getCurrentPosition()) > 2126) {
+                    while (Math.abs(ap.getCurrentPosition()) > 2126 && opModeIsActive()) {
+                        ap.setPower(0.8);
+                    }
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            //Position -705 (Shared shipping hub)
+            if (gamepad2.b) {
+                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ap.setTargetPosition(-705);
+                ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                if (Math.abs(ap.getCurrentPosition()) < 695) {
+                    while (Math.abs(ap.getCurrentPosition()) < 695 && opModeIsActive()) {
+                        ap.setPower(-0.8);
+                    }
+                }
+                else if (Math.abs(ap.getCurrentPosition()) > 715) {
+                    while (Math.abs(ap.getCurrentPosition()) > 715 && opModeIsActive()) {
+                        ap.setPower(0.8);
+                    }
+                }
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ap.setPower(0);
+            }
+            //Resets position 0
+            if (ts2.isPressed()) {
                 ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
-//            //Turns 90 degrees Counterclockwise
-//            if (gamepad1.left_bumper) {
-//                double current = Globals.getImu().getAngularOrientation().firstAngle;
-//                while (Globals.getImu().getAngularOrientation().firstAngle > Globals.wrap(current - 90) && opModeIsActive()) {
-//                    fl.setPower(0.3);
-//                    fr.setPower(-0.3);
-//                    rl.setPower(0.3);
-//                    rr.setPower(-0.3);
-//                }
-//                fl.setPower(0);
-//                fr.setPower(0);
-//                rl.setPower(0);
-//                rr.setPower(0);
-//            }
-//            //Turns 90 degrees Clockwise
-//            if (gamepad1.right_bumper) {
-//                timer1.reset();
-//                while (Globals.getImu().getAngularOrientation().firstAngle < Globals.wrap(current + 90) && opModeIsActive() && timer1.seconds() < 5) {
-//                    fl.setPower(-0.3);
-//                    fr.setPower(0.3);
-//                    rl.setPower(-0.3);
-//                    rr.setPower(0.3);
-//                }
-//                fl.setPower(0);
-//                fr.setPower(0);
-//                rl.setPower(0);
-//                rr.setPower(0);
-//            }
+            //Runs servos to output item
+            if (gamepad2.right_trigger > 0.5) {
+                cs1.setPower(-0.50);
+                cs2.setPower(0.35);
+            }
+            //Runs servos to input item
+            else if (!ts1.isPressed() && gamepad2.right_bumper) {
+                cs1.setPower(0.50);
+                cs2.setPower(-0.35);
+                runningInput = true;
+            }
+            //If item presses button or arm driver presses right trigger
+            else if (ts1.isPressed() || gamepad2.right_trigger > 0.2) {
+                cs1.setPower(-0.50);
+                cs2.setPower(0.35);
+                runningInput = false;
+                sleep(4);
+                cs1.setPower(0);
+                cs2.setPower(0);
+            }
+            // If none, sets power to 0
+            else {
+                cs1.setPower(0);
+                cs2.setPower(0);
+            }
             // Resets IMU angle
             if (gamepad1.left_stick_button) {
                 angle = Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
             }
             // Drives forward
             if (gamepad1.dpad_up) {
-                fl.setVelocity(1600);
-                fr.setVelocity(1600);
-                rl.setVelocity(1600);
-                rr.setVelocity(1600);
+                drive(0,0.9,0);
             }
             //Drives backward
-            else if (gamepad1.dpad_down) {
-                fl.setVelocity(-1600);
-                fr.setVelocity(-1600);
-                rl.setVelocity(-1600);
-                rr.setVelocity(-1600);
+            if (gamepad1.dpad_down) {
+                drive(0,-0.9,0);
             }
             //Drives left
-            else if (gamepad1.dpad_left) {
-                fl.setVelocity(-1600);
-                fr.setVelocity(-1600);
-                rl.setVelocity(1600);
-                rr.setVelocity(1600);
+            if (gamepad1.dpad_left) {
+                drive(0.9,0,0);
             }
             //Drives right
-            else if (gamepad1.dpad_right) {
-                fl.setVelocity(1600);
-                fr.setVelocity(1600);
-                rl.setVelocity(-1600);
-                rr.setVelocity(-1600);
-            }
-            else if (!driveAllowed) {
-                fl.setVelocity(0);
-                fr.setVelocity(0);
-                rl.setVelocity(0);
-                rr.setVelocity(0);
+            if (gamepad1.dpad_right) {
+                drive(-0.9,0,0);
             }
             // Turns left
             if (gamepad1.left_trigger > 0.4) {
-                fl.setPower(-0.8);
-                fr.setPower(0.8);
-                rl.setPower(-0.8);
-                rr.setPower(0.8);
+                drive(0, 0, 0.8);
             }
             // Turns right
             if (gamepad1.right_trigger > 0.4) {
-                fl.setPower(0.8);
-                fr.setPower(-0.8);
-                rl.setPower(0.8);
-                rr.setPower(-0.8);
+                drive(0, 0, -0.8);
             }
             //Ups turning speed
             if (gamepad1.a && !cp1.a) {
@@ -328,34 +297,17 @@ public class DarkMatter extends LinearOpMode {
                     turningspeed = 0.25;
                 }
             }
-            //On or Off for FieldCentric
-            if (gamepad1.b && !cp1.b) {
-                fieldCentric = !fieldCentric;
-            }
             //Copy Gamepads
             try {
                 cp1.copy(gamepad1);
                 cp2.copy(gamepad2);
             } catch (Exception ignored) {}
-            armRotation();
-            armPitch();
-            inputOutputControl();
-            if (ts2.isPressed()) {
-                pressed = true;
+            //Runs servos to input item
+            if (runningInput) {
+                cs1.setPower(0.50);
+                cs2.setPower(-0.35);
             }
-
-            //Resets position 0
-            if (pressed && !ts2.isPressed()) {
-                ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                ar.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                pressed = false;
-            }
-            //Something
-            if (gamepad1.guide) {
-                new ɿɘttɒMʞɿɒႧ();
-            }
+            arm();
         }
     }
 }
