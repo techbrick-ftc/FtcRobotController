@@ -40,10 +40,10 @@ public class DarkMatter extends LinearOpMode {
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
 
-        fl.setPower(frontLeftPower * driveSpeed);
-        rl.setPower(backLeftPower * driveSpeed);
-        fr.setPower(frontRightPower * driveSpeed);
-        rr.setPower(backRightPower * driveSpeed);
+        fl.setVelocity((frontLeftPower * driveSpeed) * 1800);
+        rl.setVelocity((backLeftPower * driveSpeed) * 1800);
+        fr.setVelocity((frontRightPower * driveSpeed) * 1800);
+        rr.setVelocity((backRightPower * driveSpeed) * 1800);
 
     }
     //Test and Moves arm:
@@ -236,6 +236,8 @@ public class DarkMatter extends LinearOpMode {
             if (ts2.isPressed()) {
                 ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                ar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                ar.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
             //Runs servos to output item
             if (gamepad2.right_trigger > 0.5) {
