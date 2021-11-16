@@ -63,22 +63,22 @@ public class DarkMatter extends LinearOpMode {
         if (gamepad2.left_stick_y > 0.1) {
             ap.setTargetPosition(-3050);
             ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            ap.setPower(-Math.sqrt(gamepad2.left_stick_y * gamepad2.left_stick_y + gamepad2.left_stick_x * gamepad2.left_stick_x));
+            ap.setVelocity(1600);
         }
         if (gamepad2.left_stick_y < -0.1) {
             ap.setTargetPosition(0);
             ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            ap.setPower(Math.sqrt(gamepad2.left_stick_y * gamepad2.left_stick_y + gamepad2.left_stick_x * gamepad2.left_stick_x));
+            ap.setVelocity(1600);
         }
         if (gamepad2.right_stick_y > 0.1) {
             ap.setTargetPosition(-3050);
             ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            ap.setPower(-0.3);
+            ap.setVelocity(-1000);
         }
         if (gamepad2.right_stick_y < -0.1) {
             ap.setTargetPosition(0);
             ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            ap.setPower(0.3);
+            ap.setVelocity(1000);
         }
     }
     @Override
@@ -113,9 +113,13 @@ public class DarkMatter extends LinearOpMode {
             if (ap.getCurrentPosition() < -5650) {
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 while (ap.getCurrentPosition() < -5500) {
-                    ap.setPower(0.6);
+                    ap.setVelocity(1500);
                 }
-                ap.setPower(0);
+                ap.setVelocity(0);
+            }
+            //Checks if not busy and stops
+            if (!ap.isBusy()) {
+                ap.setVelocity(0);
             }
             //Updates and drives
             Globals.getImu().getPosition();
@@ -155,17 +159,17 @@ public class DarkMatter extends LinearOpMode {
             if (gamepad2.left_bumper) {
                 ap.setTargetPosition(-3050);
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ap.setPower(-0.8);
+                ap.setVelocity(-1600);
             }
             //Arm down
             else if (gamepad2.left_trigger > 0.4) {
                 ap.setTargetPosition(0);
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ap.setPower(0.8);
+                ap.setVelocity(1600);
             }
             //Disables arm movement up or down
             else {
-                ap.setPower(0);
+                ap.setVelocity(0);
             }
             //Position 0 (Intake)
             if (gamepad2.a) {
@@ -173,10 +177,10 @@ public class DarkMatter extends LinearOpMode {
                 ap.setTargetPosition(0);
                 ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 while (Math.abs(ap.getCurrentPosition()) > 10) {
-                    ap.setPower(-0.8);
+                    ap.setVelocity(-1600);
                 }
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ap.setPower(0);
+                ap.setVelocity(0);
             }
             //Position -3050 (Level 3 shipping hub)
             if (gamepad2.y) {
@@ -185,16 +189,16 @@ public class DarkMatter extends LinearOpMode {
                 ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 if (Math.abs(ap.getCurrentPosition()) < 3040) {
                     while (Math.abs(ap.getCurrentPosition()) < 3040 && opModeIsActive()) {
-                        ap.setPower(-0.8);
+                        ap.setVelocity(-1600);
                     }
                 }
                 else if (Math.abs(ap.getCurrentPosition()) > 3060) {
                     while (Math.abs(ap.getCurrentPosition()) > 3060 && opModeIsActive()) {
-                        ap.setPower(0.8);
+                        ap.setVelocity(1600);
                     }
                 }
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ap.setPower(0);
+                ap.setVelocity(0);
             }
             //Position -2216 (Duck Position)
             if (gamepad2.x) {
@@ -203,16 +207,16 @@ public class DarkMatter extends LinearOpMode {
                 ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 if (Math.abs(ap.getCurrentPosition()) < 2106) {
                     while (Math.abs(ap.getCurrentPosition()) < 2106 && opModeIsActive()) {
-                        ap.setPower(-0.8);
+                        ap.setVelocity(-1600);
                     }
                 }
                 else if (Math.abs(ap.getCurrentPosition()) > 2126) {
                     while (Math.abs(ap.getCurrentPosition()) > 2126 && opModeIsActive()) {
-                        ap.setPower(0.8);
+                        ap.setVelocity(1600);
                     }
                 }
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ap.setPower(0);
+                ap.setVelocity(0);
             }
             //Position -705 (Shared shipping hub)
             if (gamepad2.b) {
@@ -221,16 +225,16 @@ public class DarkMatter extends LinearOpMode {
                 ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 if (Math.abs(ap.getCurrentPosition()) < 695) {
                     while (Math.abs(ap.getCurrentPosition()) < 695 && opModeIsActive()) {
-                        ap.setPower(-0.8);
+                        ap.setVelocity(-1600);
                     }
                 }
                 else if (Math.abs(ap.getCurrentPosition()) > 715) {
                     while (Math.abs(ap.getCurrentPosition()) > 715 && opModeIsActive()) {
-                        ap.setPower(0.8);
+                        ap.setVelocity(1600);
                     }
                 }
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ap.setPower(0);
+                ap.setVelocity(0);
             }
             //Resets position 0
             if (ts2.isPressed()) {
