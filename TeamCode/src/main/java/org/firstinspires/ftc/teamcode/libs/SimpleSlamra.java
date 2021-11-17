@@ -87,8 +87,8 @@ public class SimpleSlamra {
                 break;
             }
 
-            // Skips if timeout
-            if (timeout != 0 && timeoutTimer.seconds() > timeout) {
+            // Stops robot and ends the loop if timeout has been reached
+            if (timeout != 0 && timeoutTimer.milliseconds() > timeout) {
                 halt();
                 break;
             }

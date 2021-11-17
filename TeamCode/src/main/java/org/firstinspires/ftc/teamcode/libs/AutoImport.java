@@ -136,7 +136,7 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
     // Function which pushes the robot spinner into the wall, before running it. True = red
     public void doSpinny(boolean side, int timeout) {
         if (side) { // red
-            slauto.drive(60, 60, -90, 0.5, timeout, this, false, false);
+            slauto.drive(65, -65, -90, 0.5, timeout, this, false, false);
             spinner.setPower(0.5);
             sleep(5000);
             spinner.setPower(0);
