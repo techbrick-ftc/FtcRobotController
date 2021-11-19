@@ -190,7 +190,6 @@ public class DarkMatter extends LinearOpMode {
             else if (!ap.isBusy()) {
                 ap.setVelocity(0);
             }
-            //Disables arm movement up or down
             //Position 0 (Intake)
             if (gamepad2.a) {
                 ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
