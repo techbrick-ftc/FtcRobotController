@@ -139,6 +139,11 @@ public class DarkMatter extends LinearOpMode {
             double x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
             drive(x2, y2, rx);
+            //Calibrate pitch
+            if (gamepad2.start) {
+                ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
             //Duck Spin
             if (gamepad2.dpad_up && !cp2.dpad_up) {
                 cs1.setPower(1.0);
@@ -149,10 +154,10 @@ public class DarkMatter extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 double current = Globals.getImu().getAngularOrientation().firstAngle;
                 while (Globals.getImu().getAngularOrientation().firstAngle > Globals.wrap(current - 90) && opModeIsActive()) {
-                    fl.setPower(-0.5);
-                    fr.setPower(0.5);
-                    rl.setPower(-0.5);
-                    rr.setPower(0.5);
+                    fl.setPower(0.5);
+                    fr.setPower(-0.5);
+                    rl.setPower(0.5);
+                    rr.setPower(-0.5);
                 }
                 fl.setPower(0);
                 fr.setPower(0);
@@ -163,10 +168,10 @@ public class DarkMatter extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 double current = Globals.getImu().getAngularOrientation().firstAngle;
                 while (Globals.getImu().getAngularOrientation().firstAngle < Globals.wrap(current + 90) && opModeIsActive()) {
-                    fl.setPower(0.5);
-                    fr.setPower(-0.5);
-                    rl.setPower(0.5);
-                    rr.setPower(-0.5);
+                    fl.setPower(-0.5);
+                    fr.setPower(0.5);
+                    rl.setPower(-0.5);
+                    rr.setPower(0.5);
                 }
                 fl.setPower(0);
                 fr.setPower(0);
@@ -312,7 +317,7 @@ public class DarkMatter extends LinearOpMode {
                 pressed = false;
             }
             if (ap.getCurrentPosition() > 0 && !gamepad2.left_stick_button && !gamepad2.right_stick_button) {
-                while (ap.getCurrentPosition() > -100) {
+                if (ap.getCurrentPosition() > -100) {
                     ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     ap.setVelocity(-1000);
                 }
