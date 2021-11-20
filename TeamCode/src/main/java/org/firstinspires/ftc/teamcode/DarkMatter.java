@@ -147,13 +147,16 @@ public class DarkMatter extends LinearOpMode {
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
             //Duck Spin
-            if (gamepad2.dpad_up && !cp2.dpad_up) {
+            if (gamepad2.guide && !cp2.guide) {
                 cs2.setPower(-1);
                 duckControl = !duckControl;
             }
             //Turns 90 degrees Counterclockwise
             if (gamepad1.left_bumper) {
                 double current = Globals.getImu().getAngularOrientation().firstAngle;
+                telemetry.addData("CURRENT", current);
+                telemetry.addData("NEW", Globals.wrap(current - 90));
+                telemetry.update();
                 while (Globals.getImu().getAngularOrientation().firstAngle > Globals.wrap(current - 90) && opModeIsActive()) {
                     fl.setPower(0.3);
                     fr.setPower(-0.3);
@@ -168,6 +171,9 @@ public class DarkMatter extends LinearOpMode {
             //Turns 90 degrees Clockwise
             if (gamepad1.right_bumper) {
                 double current = Globals.getImu().getAngularOrientation().firstAngle;
+                telemetry.addData("CURRENT", current);
+                telemetry.addData("NEW", Globals.wrap(current + 90));
+                telemetry.update();
                 while (Globals.getImu().getAngularOrientation().firstAngle < Globals.wrap(current + 90) && opModeIsActive()) {
                     fl.setPower(-0.3);
                     fr.setPower(0.3);
