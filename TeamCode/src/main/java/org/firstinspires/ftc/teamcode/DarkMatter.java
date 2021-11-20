@@ -138,26 +138,27 @@ public class DarkMatter extends LinearOpMode {
             double y2 = -gamepad1.left_stick_y;
             double x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
-            drive(x2, y2, rx);
+            if (y2 > 0.15 || x2 > 0.15 || rx > 0.15) {
+                drive(x2, y2, rx);
+            }
             //Calibrate pitch
-            if (gamepad2.start) {
+            if (gamepad2.back) {
                 ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 ap.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
             //Duck Spin
             if (gamepad2.dpad_up && !cp2.dpad_up) {
-                cs1.setPower(1.0);
-                cs2.setPower(-0.55);
+                cs2.setPower(-1);
                 duckControl = !duckControl;
             }
             //Turns 90 degrees Counterclockwise
             if (gamepad1.left_bumper) {
                 double current = Globals.getImu().getAngularOrientation().firstAngle;
                 while (Globals.getImu().getAngularOrientation().firstAngle > Globals.wrap(current - 90) && opModeIsActive()) {
-                    fl.setPower(0.5);
-                    fr.setPower(-0.5);
-                    rl.setPower(0.5);
-                    rr.setPower(-0.5);
+                    fl.setPower(0.3);
+                    fr.setPower(-0.3);
+                    rl.setPower(0.3);
+                    rr.setPower(-0.3);
                 }
                 fl.setPower(0);
                 fr.setPower(0);
@@ -168,10 +169,10 @@ public class DarkMatter extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 double current = Globals.getImu().getAngularOrientation().firstAngle;
                 while (Globals.getImu().getAngularOrientation().firstAngle < Globals.wrap(current + 90) && opModeIsActive()) {
-                    fl.setPower(-0.5);
-                    fr.setPower(0.5);
-                    rl.setPower(-0.5);
-                    rr.setPower(0.5);
+                    fl.setPower(-0.3);
+                    fr.setPower(0.3);
+                    rl.setPower(-0.3);
+                    rr.setPower(0.3);
                 }
                 fl.setPower(0);
                 fr.setPower(0);
@@ -254,27 +255,45 @@ public class DarkMatter extends LinearOpMode {
             }
             // Drives forward
             if (gamepad1.dpad_up) {
-                drive(0,1,0);
+                fl.setVelocity(1600);
+                fr.setVelocity(1600);
+                rl.setVelocity(1600);
+                rr.setVelocity(1600);
             }
             //Drives backward
             if (gamepad1.dpad_down) {
-                drive(0,-1,0);
+                fl.setVelocity(-1600);
+                fr.setVelocity(-1600);
+                rl.setVelocity(-1600);
+                rr.setVelocity(-1600);
             }
             //Drives left
             if (gamepad1.dpad_left) {
-                drive(1,0,0);
+                fl.setVelocity(-1600);
+                fr.setVelocity(-1600);
+                rl.setVelocity(1600);
+                rr.setVelocity(1600);
             }
             //Drives right
             if (gamepad1.dpad_right) {
-                drive(-1,0,0);
+                fl.setVelocity(1600);
+                fr.setVelocity(1600);
+                rl.setVelocity(-1600);
+                rr.setVelocity(-1600);
             }
             // Turns left
             if (gamepad1.left_trigger > 0.4) {
-                drive(0, 0, 0.8);
+                fl.setPower(-0.8);
+                fr.setPower(0.8);
+                rl.setPower(-0.8);
+                rr.setPower(0.8);
             }
             // Turns right
             if (gamepad1.right_trigger > 0.4) {
-                drive(0, 0, -0.8);
+                fl.setPower(0.8);
+                fr.setPower(-0.8);
+                rl.setPower(0.8);
+                rr.setPower(-0.8);
             }
             //Ups turning speed
             if (gamepad1.a && !cp1.a) {
