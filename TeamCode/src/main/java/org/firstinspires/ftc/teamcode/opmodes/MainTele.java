@@ -52,11 +52,15 @@ public class MainTele extends AutoImport {
         Gamepad cur2 = new Gamepad();
 
         // Set up variables
+        boolean isIntakingForth = false;
+        boolean isIntakingBack = false;
         boolean isSpinningForth = false;
         boolean isSpinningBack = false;
         boolean hatchOpen = false;
         double armXMin = -0.5;
         double armXMax = 0.5;
+        int armYSetting = 0;
+        int[] armYPositions = {armY.getCurrentPosition(), -663, -1692, -2590};
 
         // Starting servo & motor positions
 
@@ -76,21 +80,57 @@ public class MainTele extends AutoImport {
             // Gives FieldCentric the stick positions
             drive.Drive(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
 
-            // Controls arm
-            // Enforces encoder barriers at 90 and -90 degrees of starting position
-            /*if (armX.getCurrentPosition() >= 356) { // constant is 1/4 of full encoder rotation
+            // Controls arm horizontal axis
+            // Enforces encoder barriers at 90 and -90 degrees of starting position horizontally
+            if (armX.getCurrentPosition() >= 926) { // constant is ~1/4 of full encoder rotation
                 armXMax = 0;
-            } else if (armX.getCurrentPosition() <= -356) {
+                armXMin = -0.5;
+            } else if (armX.getCurrentPosition() <= -926) {
+                armXMax = 0.5;
                 armXMin = 0;
             } else {
                 armXMax = 0.5;
                 armXMin = -0.5;
             }
 
-            double armYPower = Range.clip(-gamepad2.left_stick_y, -0.5, 0.5);
-            armY.setPower(armYPower);
-            double armXPower = Range.clip(-gamepad2.left_stick_x, armXMin, armXMax);
-            armX.setPower(armXPower);*/
+            double armXPower = Range.clip(gamepad2.right_stick_x, armXMin, armXMax);
+            armX.setPower(armXPower);
+
+            // Controls arm vertical axis
+            // Increments vertical position each dpad input
+            if (cur2.dpad_up && !prev2.dpad_up && (armYSetting < 4)) {
+                armYSetting++;
+                armY.setTargetPosition(armYPositions[armYSetting]);
+                armY.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armY.setPower(0.5);
+            } else if (cur2.dpad_down && !prev2.dpad_down && (armYSetting > 0)) {
+                armYSetting--;
+                armY.setTargetPosition(armYPositions[armYSetting]);
+                armY.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armY.setPower(0.5);
+            }
+
+            // Toggles intake
+            if (!isIntakingForth && cur2.right_bumper && !prev2.right_bumper) {
+                intake.setPower(1);
+                isIntakingForth = true;
+            } else if (!isIntakingBack && cur2.left_bumper && !prev2.left_bumper) {
+                intake.setPower(-1);
+                isIntakingBack = true;
+            } else if ((isIntakingForth || isIntakingBack) && (cur2.right_bumper && !prev2.right_bumper) || (cur2.left_bumper && !prev2.left_bumper)) {
+                intake.setPower(0);
+                isIntakingForth = false;
+                isIntakingBack = false;
+            }
+
+            // Toggles intake hatch
+            if (!hatchOpen && (cur2.right_trigger > 0.1) && (prev2.right_trigger < 0.1)) {
+                hatch.setPosition(-1);
+                hatchOpen = true;
+            } else if (hatchOpen && (cur2.right_trigger > 0.1) && (prev2.right_trigger < 0.1)) {
+                hatch.setPosition(1);
+                hatchOpen = false;
+            }
 
             // Toggles spinner
             if (!isSpinningForth && cur2.a && !prev2.a) {
@@ -126,6 +166,12 @@ public class MainTele extends AutoImport {
             packet.put("fl power", fl.getPower());
             packet.put("rr power", rr.getPower());
             packet.put("rl power", rl.getPower());
+            packet.put("armXPower", armXPower);
+            packet.put("armYStick", -gamepad2.right_stick_y);
+            packet.put("armXStick", -gamepad2.left_stick_x);
+            packet.put("armXEnc", armX.getCurrentPosition());
+            packet.put("armYEnc", armY.getCurrentPosition());
+            packet.put("armYSetting", armYSetting);
             dashboard.sendTelemetryPacket(packet);
 
             loops++;

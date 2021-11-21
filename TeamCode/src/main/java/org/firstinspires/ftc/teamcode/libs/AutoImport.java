@@ -81,16 +81,12 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         armX.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armY = hardwareMap.get(DcMotor.class, "armY");
         armY.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //armY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         intake = hardwareMap.get(DcMotor.class, "intake");
         hatch = hardwareMap.get(Servo.class, "hatch");
 
         spinner = hardwareMap.get(CRServo.class, "spinner");
-
-
-        //armBoundaryMin = hardwareMap.get(TouchSensor.class, "armBoundaryMin");
-        //armBoundaryMax = hardwareMap.get(TouchSensor.class, "armBoundaryMax");
 
         // initializes imu
         setupIMU(hardwareMap);
