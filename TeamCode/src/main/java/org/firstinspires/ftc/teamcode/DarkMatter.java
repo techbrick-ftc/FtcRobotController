@@ -34,6 +34,7 @@ public class DarkMatter extends LinearOpMode {
     boolean duckControl = false;
     boolean pressed = false;
     boolean fieldCentric = true;
+    boolean driveAllowed;
     Gamepad cp1;
     Gamepad cp2;
     //
@@ -221,9 +222,10 @@ public class DarkMatter extends LinearOpMode {
             //Updates and drives
             Globals.getImu().getPosition();
             double y2 = -gamepad1.left_stick_y;
-            double x2 = gamepad1.left_stick_x;
+            double x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
-            if (y2 > 0.2 || x2 > 0.2 || rx > 0.2) {
+            driveAllowed = y2 > 0.2 || x2 > 0.2 || rx > 0.2 || y2 < -0.2 || x2 < -0.2 || rx < -0.2;
+            if (driveAllowed) {
                 if (fieldCentric) {
                     fieldCentricDrive(x2, y2, rx);
                 }
@@ -296,7 +298,7 @@ public class DarkMatter extends LinearOpMode {
                 rl.setVelocity(-1600);
                 rr.setVelocity(-1600);
             }
-            else {
+            else if (!driveAllowed) {
                 fl.setVelocity(0);
                 fr.setVelocity(0);
                 rl.setVelocity(0);
