@@ -173,8 +173,8 @@ public class SimpleSlamra {
         Translation2d pose = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
 
         // Saves the robot's current position
-        currentX = -pose.getX();
-        currentY = -pose.getY();
+        currentX = pose.getX();
+        currentY = pose.getY();
 
         rotation = up.pose.getRotation();
         confidence = up.confidence;
