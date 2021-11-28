@@ -52,8 +52,8 @@ public class MainTele extends AutoImport {
         Gamepad cur2 = new Gamepad();
 
         // Set up variables
-        boolean isIntakingForth = false;
-        boolean isIntakingBack = false;
+        boolean intaking = false;
+        boolean outtaking = false;
         boolean isSpinningForth = false;
         boolean isSpinningBack = false;
         boolean hatchOpen = false;
@@ -98,29 +98,45 @@ public class MainTele extends AutoImport {
 
             // Controls arm vertical axis
             // Increments vertical position each dpad input
-            if (cur2.dpad_up && !prev2.dpad_up && (armYSetting < 4)) {
+            if (cur2.dpad_up && !prev2.dpad_up && (armYSetting < 3)) {
                 armYSetting++;
                 armY.setTargetPosition(armYPositions[armYSetting]);
                 armY.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armY.setPower(0.5);
+                armY.setPower(1);
             } else if (cur2.dpad_down && !prev2.dpad_down && (armYSetting > 0)) {
                 armYSetting--;
                 armY.setTargetPosition(armYPositions[armYSetting]);
                 armY.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armY.setPower(0.5);
+                armY.setPower(1);
+            }
+
+            if (!armY.isBusy()) {
+                armY.setPower(0);
             }
 
             // Toggles intake
-            if (!isIntakingForth && cur2.right_bumper && !prev2.right_bumper) {
-                intake.setPower(1);
-                isIntakingForth = true;
-            } else if (!isIntakingBack && cur2.left_bumper && !prev2.left_bumper) {
-                intake.setPower(-1);
-                isIntakingBack = true;
-            } else if ((isIntakingForth || isIntakingBack) && (cur2.right_bumper && !prev2.right_bumper) || (cur2.left_bumper && !prev2.left_bumper)) {
-                intake.setPower(0);
-                isIntakingForth = false;
-                isIntakingBack = false;
+            if (cur2.right_bumper && !prev2.right_bumper) {
+                if (!intaking) {
+                    intake.setPower(-1);
+                    intaking = true;
+                    outtaking = false;
+                }
+                else {
+                    intake.setPower(0);
+                    intaking = false;
+                    outtaking = false;
+                }
+            } else if (cur2.left_bumper && !prev2.left_bumper) {
+                if (!outtaking) {
+                    intake.setPower(1);
+                    intaking = false;
+                    outtaking = true;
+                }
+                else {
+                    intake.setPower(0);
+                    intaking = false;
+                    outtaking = false;
+                }
             }
 
             // Toggles intake hatch
@@ -133,16 +149,28 @@ public class MainTele extends AutoImport {
             }
 
             // Toggles spinner
-            if (!isSpinningForth && cur2.a && !prev2.a) {
-                spinner.setPower(1);
-                isSpinningForth = true;
-            } else if (!isSpinningBack && cur2.x && !prev2.x) {
-                spinner.setPower(-1);
-                isSpinningBack = true;
-            } else if ((isSpinningForth || isSpinningBack) && (cur2.a && !prev2.a) || (cur2.x && !prev2.x)) {
-                spinner.setPower(0);
-                isSpinningForth = false;
-                isSpinningBack = false;
+            if (cur2.a && !prev2.a) {
+                if (!isSpinningForth) {
+                    spinner.setPower(1);
+                    isSpinningForth = true;
+                    isSpinningBack = false;
+                }
+                else {
+                    spinner.setPower(0);
+                    isSpinningForth = false;
+                    isSpinningBack = false;
+                }
+            } else if (cur2.x && !prev2.x) {
+                if (!isSpinningBack) {
+                    spinner.setPower(-1);
+                    isSpinningForth = false;
+                    isSpinningBack = true;
+                }
+                else {
+                    spinner.setPower(0);
+                    isSpinningForth = false;
+                    isSpinningBack = false;
+                }
             }
 
             // Reset Field Centric button
@@ -172,6 +200,8 @@ public class MainTele extends AutoImport {
             packet.put("armXEnc", armX.getCurrentPosition());
             packet.put("armYEnc", armY.getCurrentPosition());
             packet.put("armYSetting", armYSetting);
+            packet.put("intakeControl", cur2.right_bumper);
+            packet.put("intakePower", intake.getPower());
             dashboard.sendTelemetryPacket(packet);
 
             loops++;

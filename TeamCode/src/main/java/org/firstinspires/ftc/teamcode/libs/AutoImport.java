@@ -113,7 +113,7 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
         dashboard.sendTelemetryPacket(packet);
 
         // sets servos to starting positions
-        //put code here
+        hatch.setPosition(1);
 
         camera.startDetection();
 
