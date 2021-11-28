@@ -95,7 +95,7 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
 
         // initializes easyopencv
         // width and height of vision box are hardcoded here
-        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, camera1X, camera1Y, camera2X, camera2Y, 18, 45);
+        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, camera1X, camera1Y, camera2X, camera2Y, 45, 18);
 
         // initializes slamra
         Pose2d startingPose = new Pose2d(new Translation2d(startingPoseX * 0.0254, startingPoseY * 0.0254), new Rotation2d(0));
@@ -137,9 +137,9 @@ public class AutoImport extends LinearOpMode implements TeleAuto {
     // Function which pushes the robot spinner into the wall, before running it. True = red
     public void doSpinny(boolean side, int timeout) {
         if (side) { // red
-            slauto.drive(65, -65, -90, 0.5, timeout, this, false, false);
-            spinner.setPower(0.5);
-            sleep(5000);
+            slauto.drive(65, -60, -90, 0.5, timeout, this, false, false);
+            spinner.setPower(-0.8);
+            sleep(4000);
             spinner.setPower(0);
 
         } else { // blue

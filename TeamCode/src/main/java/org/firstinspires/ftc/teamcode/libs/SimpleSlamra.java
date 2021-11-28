@@ -245,10 +245,10 @@ public class SimpleSlamra {
         // Y is negated because digital y is special
         Canvas field = packet.fieldOverlay();
         final int robotRadius = 9;
-        field.strokeCircle(currentX, -currentY, robotRadius);
+        field.strokeCircle(currentX, currentY, robotRadius);
         double arrowX = rotation.getCos() * robotRadius, arrowY = rotation.getSin() * robotRadius;
-        double x1 = currentX + arrowX  / 2, y1 = -currentY + arrowY / 2;
-        double x2 = currentX + arrowX, y2 = -currentY + arrowY;
+        double x1 = currentX + arrowX  / 2, y1 = currentY + arrowY / 2;
+        double x2 = currentX + arrowX, y2 = currentY + arrowY;
         field.strokeLine(x1, y1, x2, y2);
 
         dashboard.sendTelemetryPacket(packet);
