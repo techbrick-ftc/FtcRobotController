@@ -42,15 +42,25 @@ public class FieldCentric {
         this.offset = angle();
     }
 
-    public void resetAngle() {
+    public void setUp(DcMotor[] motors, double[] wheelAngles, BNO055IMU imu, HardwareMap hardwareMap) {
+        // Check if we have angles for every motor, and vice versa
+        if (motors.length != wheelAngles.length) {
+            throw new RuntimeException("Motor and wheelAngle arrays do not have same length.\nCheck your code!!!");
+        }
+
+        this.motors = motors;
+        this.wheelAngles = wheelAngles;
+        this.wheelPowers = new double[motors.length];
+        this.imu = imu;
         this.offset = angle();
+    }
+
+    public void resetAngle() {
+        this.offset = this.angle;
     }
 
     public void gyro() {
         this.angle = angle();
-    }
-    public void gyro(double angle) {
-        this.angle = angle;
     }
 
     /**

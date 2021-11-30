@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.libs;
 
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.spartronics4915.lib.T265Camera;
 
@@ -40,7 +41,7 @@ public class Globals {
 
     public static void setupIMU(HardwareMap hardwareMap) {
         if (imu == null) {
-            imu = hardwareMap.get(BNO055IMU.class, "imu");
+            imu = hardwareMap.get(BNO055IMU.class, "imu1");
             BNO055IMU.Parameters params = new BNO055IMU.Parameters();
             imu.initialize(params);
             System.out.println("Setup IMU");
