@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
@@ -63,8 +62,6 @@ public class Main extends LinearOpMode {
 
         boolean slower = false;
         double slowerSpeed = .5;
-
-        int loops = 1;
 
         // Toast notification because I can
         AppUtil.getInstance().showToast(UILocation.BOTH, "Iteration 7.3-8.3");
