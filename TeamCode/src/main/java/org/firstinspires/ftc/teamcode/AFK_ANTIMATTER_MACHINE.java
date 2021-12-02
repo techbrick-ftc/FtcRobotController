@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.libs.EasyOpenCVImportable;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 //535 tpr
 @Autonomous(name="AFK ANTIMATTER MACHINE")
@@ -24,6 +25,7 @@ public class AFK_ANTIMATTER_MACHINE extends LinearOpMode {
     DcMotor rl;
     DcMotor rr;
     DcMotor ap;
+    EasyOpenCVImportable camera;
     final double ticksPerInch = 1000;
     public void afkdriveTURBO(double inX) {
         afkdriveSPEEDSET(inX, 1);
@@ -68,9 +70,11 @@ public class AFK_ANTIMATTER_MACHINE extends LinearOpMode {
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
         rr = hardwareMap.get(DcMotor.class, "rr");
+        camera =  new EasyOpenCVImportable();
         Globals.setupIMU(hardwareMap);
         telemetry.addLine("Loading...");
         telemetry.update();
+        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, 1, 2, 3, 4, 45, 18);
         waitForStart();
         telemetry.addLine("The AFK Minecraft Player has started AFKing...");
         telemetry.update();

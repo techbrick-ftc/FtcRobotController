@@ -47,7 +47,7 @@ public class DarkMatter extends LinearOpMode {
     public void fieldCentricDrive(double x2, double y2, double rx) {
         Orientation orientation = Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         double x = x2 * Math.cos(-(orientation.firstAngle - angle)) - y2 * Math.sin(-(orientation.firstAngle - angle));
-        double y = y2 * Math.cos(-(orientation.firstAngle - angle)) - x2 * Math.sin(-(orientation.firstAngle - angle));
+        double y = y2 * Math.cos(-(orientation.firstAngle - angle)) + x2 * Math.sin(-(orientation.firstAngle - angle));
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         double frontLeftPower = (y + x + rx) / denominator;
         double backLeftPower = (y - x + rx) / denominator;
@@ -81,16 +81,16 @@ public class DarkMatter extends LinearOpMode {
         double onx = gamepad2.right_stick_x;
         double onx2 = gamepad2.left_stick_x;
         if (onx > 0.3 && (ar.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ar.setVelocity(900);
+            ar.setVelocity(1000);
         }
         else if (onx < -0.45 && ( ar.getCurrentPosition() > -9200 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ar.setVelocity(-900);
+            ar.setVelocity(-1000);
         }
         else if (onx2 > 0.3 && ar.getCurrentPosition() < 0) {
-            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 1500);
+            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 2300);
         }
         else if (onx2 < -0.3 && ar.getCurrentPosition() > -9200) {
-            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 1500);
+            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 2300);
         }
         else {
             ar.setVelocity(0);
@@ -102,12 +102,10 @@ public class DarkMatter extends LinearOpMode {
     public void armPitch() {
         //Arm up
         if (gamepad2.left_bumper && (ap.getCurrentPosition() > -5650 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ap.setVelocity(-1600);
         }
         //Arm down
         else if (gamepad2.left_trigger > 0.4 && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ap.setVelocity(1600);
         }
         //Checks if not busy
@@ -116,38 +114,27 @@ public class DarkMatter extends LinearOpMode {
         }
         //Position 0 (Intake)
         if (gamepad2.a) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ap.setTargetPosition(0);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(-1600);
         }
         //Position -3050 (Level 3 shipping hub)
         else if (gamepad2.y) {
-//                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ap.setTargetPosition(-3050);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(-1600);
         }
         //Position -2216 (Duck Position)
         else if (gamepad2.x) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ap.setTargetPosition(-2116);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(-1600);
         }
         //Position -705 (Shared shipping hub)
         else if (gamepad2.b) {
-            ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ap.setTargetPosition(-705);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(-1600);
-        }
-        //Checks if below bottom limit
-        if (ap.getCurrentPosition() > 0 && !gamepad2.left_stick_button && !gamepad2.right_stick_button) {
-            if (ap.getCurrentPosition() > -100) {
-                ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                ap.setVelocity(-1000);
-            }
         }
     }
     //
@@ -156,7 +143,7 @@ public class DarkMatter extends LinearOpMode {
     public void inputOutputControl() {
         //Duck Spin
         if (gamepad2.guide && !cp2.guide) {
-            cs1.setPower(-1);
+            cs2.setPower(-1);
             duckControl = !duckControl;
         }
         //Runs servos to output item
@@ -189,7 +176,7 @@ public class DarkMatter extends LinearOpMode {
             cs2.setPower(-0.35);
         }
         if (duckControl) {
-            cs1.setPower(-1);
+            cs2.setPower(-1);
         }
     }
     @Override
@@ -207,6 +194,7 @@ public class DarkMatter extends LinearOpMode {
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         ts2 = hardwareMap.get(TouchSensor.class, "ts2");
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Globals.setupIMU(hardwareMap);
         telemetry.addLine("Injecting Dark Matter...");
         telemetry.update();
