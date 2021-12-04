@@ -56,6 +56,7 @@ public class Main extends LinearOpMode {
         int lifterMin = -8000;
         int lifterMax = 0;
         double lifterSpeed;
+        boolean lifterMoving = false;
 
         int intaking = 0;
         double spinSpeed = .7;
@@ -86,12 +87,22 @@ public class Main extends LinearOpMode {
             // Controls the lifter
             lifterSpeed = gamepad2.left_stick_y;
             int curPos = robot.getLifter().getCurrentPosition();
-            if (curPos > lifterMax - 2) { // If the lifter is near the maximum, don't let it go down more (because that's how the lifter works)
+            if (lifterMoving) {
+                if (lifterSpeed > 0.1 || lifterSpeed < -0.1) { lifterMoving = false; lifterSpeed = (0); }
+                if (curPos < -6653) { lifterSpeed = 1; }
+                else if (curPos < -6652) { lifterMoving = false; lifterSpeed = 0; }
+                else if (curPos > -6651) { lifterSpeed = (-1); }
+            } else if (curPos > lifterMax - 2) { // If the lifter is near the maximum, don't let it go down more (because that's how the lifter works)
                 lifterSpeed = clamp(-1, 0, lifterSpeed);
             } else if (curPos < lifterMin + 2) { // If the lifter is near the minimum, don't left it go up
                 lifterSpeed = clamp(0, 1, lifterSpeed);
             }
+
+            if (gamepad2.y && !cp2.y) {
+                lifterMoving = !lifterMoving;
+            }
             robot.getLifter().setPower(lifterSpeed); // Actually set the speed
+            telemetry.addData("Lifter", curPos); // -6652
 
             // Intake control
             if (intaking == 0 && gamepad2.a && !cp2.a) {

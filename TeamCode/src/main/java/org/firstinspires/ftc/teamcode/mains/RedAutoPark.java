@@ -22,6 +22,11 @@ public class RedAutoPark extends LinearOpMode implements TeleAuto {
         robot.flMotor().setDirection(DcMotor.Direction.REVERSE);
         robot.rlMotor().setDirection(DcMotor.Direction.REVERSE);
 
+        robot.flMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.frMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rlMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rrMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         waitForStart();
 
         if (opModeIsActive()) {
@@ -30,7 +35,14 @@ public class RedAutoPark extends LinearOpMode implements TeleAuto {
             robot.getLifter().setPower(0);
 
             strafe(0.5, 1200);
-            forwards(0.5, 500);
+            forwards(0.5, 800);
+            sleep(100);
+            strafe(0.5, 1500);
+            sleep(500);
+
+            robot.getLifter().setPower(1);
+            sleep(1000);
+            robot.getLifter().setPower(0);
         }
     }
 
