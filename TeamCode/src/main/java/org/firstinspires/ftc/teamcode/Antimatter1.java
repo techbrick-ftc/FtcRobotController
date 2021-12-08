@@ -5,6 +5,7 @@ import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @TeleOp(name="DRIVE.EXE/Antimatter 1.0")
+@Disabled
 public class Antimatter1 extends LinearOpMode {
     @Override
     public void runOpMode() {
@@ -29,7 +31,7 @@ public class Antimatter1 extends LinearOpMode {
         final TelemetryPacket telemetryPacket = new TelemetryPacket();
 
         Globals.setupIMU(hardwareMap);
-        drive.setUp(motors, angles);
+//        drive.setUp(motors, angles);
         boolean halfSpeed = true;
         // Send telemetry message to signify robot waiting;
         telemetry.addLine("Loading...");    //
@@ -54,7 +56,7 @@ public class Antimatter1 extends LinearOpMode {
                 drive.Drive(0, 0, victoryDanceL ? -0.75 : 0.75);
                 victoryDance--;
             }
-            drive.gyro();
+//            drive.gyro();
             drive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, halfSpeed ? gamepad1.right_stick_x / 2 : gamepad1.right_stick_x);
             if (gamepad1.a && ! cp1.a) {
                 halfSpeed = !halfSpeed;

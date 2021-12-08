@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.tests;
 import static org.firstinspires.ftc.teamcode.libs.Globals.*;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
+@Disabled
 @Autonomous(name="SimpleSlamraDrive", group="test")
 public class SimpleSlamraDrive extends AutoImport {
 

@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.libs.AutoImport;
 
+@Disabled
 @Autonomous(name="DetectionTest", group="test")
 public class DetectionTest extends AutoImport {
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @TeleOp(name="Antimatter BOSS")
+@Disabled
 public class AntimatterBOSS extends LinearOpMode {
     DcMotor fl;
     DcMotor fr;
@@ -37,11 +39,11 @@ public class AntimatterBOSS extends LinearOpMode {
         rr.setPower(backRightPower);
 
     }
-    public void autorun(double x, double y) {
-        while (autorunning) {
-            drive()
-        }
-    }
+//    public void autorun(double x, double y) {
+//        while (autorunning) {
+//            drive()
+//        }
+//    }
         @Override
     public void runOpMode() {
         fl = hardwareMap.get(DcMotor.class, "fl");

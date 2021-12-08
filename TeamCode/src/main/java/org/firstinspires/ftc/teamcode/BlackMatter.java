@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 // 10700
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @TeleOp(name="Black Matter")
+@Disabled
 public class BlackMatter extends LinearOpMode {
     DcMotor fl;
     DcMotor fr;
