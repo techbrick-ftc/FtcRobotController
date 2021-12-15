@@ -119,7 +119,7 @@ public class DarkMatter extends LinearOpMode {
         else if (gamepad2.y) {
             ap.setTargetPosition(-3350);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ap.setPower(1);
+            ap.setVelocity(2500);
         }
         //Duck position
         else if (gamepad2.x) {
@@ -250,7 +250,7 @@ public class DarkMatter extends LinearOpMode {
                 }
             }
             // Resets IMU angle
-            if (gamepad1.guide) {
+            if (gamepad1.back) {
                 angle = Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle + Math.PI/2;
                 if (angle > Math.PI)
                 {
