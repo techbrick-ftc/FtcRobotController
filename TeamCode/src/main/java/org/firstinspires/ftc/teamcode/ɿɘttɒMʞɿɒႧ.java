@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 //-9200
-@TeleOp(name="🙂 ɿɘttɒM ʞɿɒႧ")
+@TeleOp(name="Dark Matter 🙂")
 public class ɿɘttɒMʞɿɒႧ extends LinearOpMode {
     //Global Variables
     DcMotorEx fl;
