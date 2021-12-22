@@ -7,5 +7,6 @@ public enum armPositionsYaw {
     degree180,
     degree225,
     duckPos,
+
     current
 }
