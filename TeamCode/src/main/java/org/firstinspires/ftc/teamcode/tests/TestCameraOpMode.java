@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
@@ -10,19 +11,26 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.spartronics4915.lib.T265Camera;
 
+import static java.lang.Math.PI;
+
+import android.util.Log;
+
 @TeleOp(name="Test T265", group="Test")
 public class TestCameraOpMode extends OpMode
 {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
+    private final String TAG = "TestCameraOpMode";
 
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
 
     @Override
     public void init() {
         if (slamra == null) {
-            slamra = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
+            slamra = new T265Camera(new Transform2d(new Translation2d(0, 6 * 0.0256), new Rotation2d(0)), 0.1, hardwareMap.appContext);
+            Log.v(TAG, "slamra initialized");
         }
+        // slamra.setPose(new Pose2d(0, 0, new Rotation2d(0)));
     }
 
     @Override
@@ -56,6 +64,7 @@ public class TestCameraOpMode extends OpMode
 
         packet.put("X", translation.getX());
         packet.put("Y", translation.getY());
+        packet.put("Angle", rotation.getRadians());
 
         dashboard.sendTelemetryPacket(packet);
     }

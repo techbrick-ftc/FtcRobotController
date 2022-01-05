@@ -35,7 +35,7 @@ public class BlueAutoPark extends LinearOpMode implements TeleAuto {
             robot.getLifter().setPower(0);
 
             strafe(-0.5, 1200);
-            forwards(0.5, 800);
+            forwards(0.5, 700);
             sleep(100);
             strafe(-0.5, 1500);
             sleep(500);

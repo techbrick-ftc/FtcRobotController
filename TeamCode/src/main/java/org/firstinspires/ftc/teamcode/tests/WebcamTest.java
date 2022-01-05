@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.libs.EasyOpenCVImportable;
@@ -19,16 +19,30 @@ public class WebcamTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Init
-        easyOpenCVImportable.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, 50, 50, 155, 50, 20, 20);
+        easyOpenCVImportable.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, RobotConfig.box1x, RobotConfig.box1y, RobotConfig.box2x, RobotConfig.box2y, 20, 20);
+
+        packet.put("x", RobotConfig.box1x);
+        dashboard.sendTelemetryPacket(packet);
 
         easyOpenCVImportable.startDetection();
         dashboard.startCameraStream(easyOpenCVImportable.getWebCamera(), 0);
-        waitForStart();
-        TestBot bot = new TestBot();
-        bot.setup(hardwareMap);
+
+        ElapsedTime et = new ElapsedTime();
+        while (!opModeIsActive() && !isStopRequested()) {
+            telemetry.addData("Time in init", et.milliseconds() / 1000);
+            telemetry.addData("Camera normalized", et.seconds() > 4);
+            telemetry.update();
+
+            packet.put("Time in init", et.milliseconds() / 1000);
+            packet.put("Camera normalized", et.seconds() > 4);
+            dashboard.sendTelemetryPacket(packet);
+        }
+
+        //TestBot bot = new TestBot();
+        //bot.setup(hardwareMap);
         if (opModeIsActive()) {
             // TeleOp loop
-            while (easyOpenCVImportable.getDetection() == -1 && opModeIsActive()) {
+            while (/*easyOpenCVImportable.getDetection() == -1 && */opModeIsActive()) {
                 int[] analysis = easyOpenCVImportable.getAnalysis();
                 int detection = easyOpenCVImportable.getDetection();
 
@@ -44,3 +58,4 @@ public class WebcamTest extends LinearOpMode {
         easyOpenCVImportable.stopDetection();
     }
 }
+

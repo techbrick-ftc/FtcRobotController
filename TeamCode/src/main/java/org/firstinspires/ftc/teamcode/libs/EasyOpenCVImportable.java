@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode.libs;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.tests.RobotConfig;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -119,8 +120,8 @@ public class EasyOpenCVImportable {
         static final Scalar GREEN = new Scalar(0, 255, 0);
 
         // Core values for position and size
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(box1PosX, box1PosY);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(box2PosX, box2PosY);
+        final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(RobotConfig.box1x, RobotConfig.box1y);
+        final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(RobotConfig.box2x, RobotConfig.box2y);
 
         static final int REGION_WIDTH = width;
         static final int REGION_HEIGHT = height;
@@ -155,7 +156,7 @@ public class EasyOpenCVImportable {
          */
         void inputToCb(Mat input) {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(YCrCb, Cb, 1);
+            Core.extractChannel(YCrCb, Cb, 0);
         }
 
         @Override
@@ -172,11 +173,11 @@ public class EasyOpenCVImportable {
             sum1 = (int) Core.mean(region1_Cb).val[0];
             sum2 = (int) Core.mean(region2_Cb).val[0];
 
-            if (sum1 < 30) {
+            if (sum1 > 200) {
                 this.position = 0;
-            } else if (sum2 < 30) {
+            } else if (sum2 > 200) {
                 this.position = 1;
-            } else if (sum1 > 30 && sum2 > 30) {
+            } else if (sum1 < 200 && sum2 < 200) {
                 this.position = 2;
             }
 

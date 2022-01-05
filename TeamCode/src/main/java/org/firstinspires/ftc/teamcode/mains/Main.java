@@ -5,6 +5,7 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -114,8 +115,8 @@ public class Main extends LinearOpMode {
                 spinner.setPower(0);
                 intaking = 0;
             } else if (intaking == 0 && gamepad2.b && !cp2.b) {
-                intake.setPower(-spinSpeed);
-                spinner.setPower(spinSpeed);
+                intake.setPower(-spinSpeed + .1);
+                spinner.setPower(spinSpeed - .1);
                 intaking = -1;
             }
 
@@ -132,11 +133,12 @@ public class Main extends LinearOpMode {
                 intake.setPower(0);
                 intaking = 0;
             } else if (gamepad2.left_bumper && !gamepad2.right_bumper) {
-                spinner.setPower(-1);
-                intake.setPower(0);
+                intake.setPower(-1);
+                spinner.setPower(0);
                 intaking = 0;
             } else if (intaking == 0) {
                 spinner.setPower(0);
+                intake.setPower(0);
             }
 
             if (gamepad1.x && !cp1.x) {
