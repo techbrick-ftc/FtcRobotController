@@ -29,30 +29,30 @@ public class DarkMatterAutoConsumer_PARKRED extends LinearOpMode {
     final int ticksOutput = -3350;
     final int ticksLow = -800;
     final int ticksDegree90 = -712;
-    public void runInches(int inches, dirrection direct, double speed) {
+    public void runInches(int inches, direction direct, double speed) {
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (direct == dirrection.forward) {
+        if (direct == direction.forward) {
             fl.setTargetPosition((int)(Math.round(tpi_d * inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_d * inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_d * inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_d * inches) + rr.getCurrentPosition()));
         }
-        else if (direct == dirrection.backward) {
+        else if (direct == direction.backward) {
             fl.setTargetPosition((int)(Math.round(tpi_d * -inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_d * -inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_d * -inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_d * -inches) + rr.getCurrentPosition()));
         }
-        else if (direct == dirrection.right) {
+        else if (direct == direction.right) {
             fl.setTargetPosition((int)(Math.round(tpi_s * inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_s * -inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_s * -inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_s * inches) + rr.getCurrentPosition()));
         }
-        else if (direct == dirrection.left) {
+        else if (direct == direction.left) {
             fl.setTargetPosition((int)(Math.round(tpi_s * -inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_s * inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_s * inches) + rl.getCurrentPosition()));
@@ -123,7 +123,7 @@ public class DarkMatterAutoConsumer_PARKRED extends LinearOpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        runInches(6, dirrection.left, 750);
+        runInches(6, direction.left, 750);
         while (ar.isBusy() || ap.isBusy() || fl.isBusy() || fr.isBusy() || rl.isBusy() || rr.isBusy()) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());
@@ -153,7 +153,7 @@ public class DarkMatterAutoConsumer_PARKRED extends LinearOpMode {
             telemetry.addData("AP", ap.getCurrentPosition());
             telemetry.update();
         }
-        runInches(12, dirrection.right, 750);
+        runInches(12, direction.right, 750);
         while ((ar.isBusy() || ap.isBusy() || fl.isBusy() || fr.isBusy() || rl.isBusy() || rr.isBusy()) && opModeIsActive()) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());
@@ -163,7 +163,7 @@ public class DarkMatterAutoConsumer_PARKRED extends LinearOpMode {
             telemetry.addData("AP", ap.getCurrentPosition());
             telemetry.update();
         }
-        runInches(31, dirrection.forward, 750);
+        runInches(31, direction.forward, 750);
         while ((ar.isBusy() || ap.isBusy() || fl.isBusy() || fr.isBusy() || rl.isBusy() || rr.isBusy()) && opModeIsActive()) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());
@@ -173,7 +173,7 @@ public class DarkMatterAutoConsumer_PARKRED extends LinearOpMode {
             telemetry.addData("AP", ap.getCurrentPosition());
             telemetry.update();
         }
-        runInches(21, dirrection.left, 750);
+        runInches(21, direction.left, 750);
         while ((ar.isBusy() || ap.isBusy() || fl.isBusy() || fr.isBusy() || rl.isBusy() || rr.isBusy()) && opModeIsActive()) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());

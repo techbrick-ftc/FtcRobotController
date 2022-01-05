@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.libs.Globals;
-// || (!fl.isBusy() && !fr.isBusy() && !rl.isBusy() && ! rr.isBusy() && !ap.isBusy() && !ar.isBusy())
 
 @Autonomous(name="BLUE DROP OFF: LEFT")
 public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
@@ -21,36 +20,40 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
     DcMotorEx rr;
     DcMotorEx ar;
     DcMotorEx ap;
+    DcMotor led;
     CRServo cs1;
     CRServo cs2;
     TouchSensor ts1;
+    TouchSensor tsleft;
+    TouchSensor tsright;
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
     final int ticksHighPitch = -3350;
-    final int ticksLowPitch = -800;
+    final int ticksMiddlePitch = -1743;
+    final int ticksLowPitch = -850;
     final int ticksDegree90Yaw = -712;
     final int ticksDegree270Yaw = -2138;
     final int ticksDegree180Yaw = -1425;
-    public void runInches(int inches, dirrection direct, double speed) {
-        if (direct == dirrection.forward) {
+    public void runInches(int inches, direction direct, double speed) {
+        if (direct == direction.forward) {
             fl.setTargetPosition((int)(Math.round(tpi_d * inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_d * inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_d * inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_d * inches) + rr.getCurrentPosition()));
         }
-        else if (direct == dirrection.backward) {
+        else if (direct == direction.backward) {
             fl.setTargetPosition((int)(Math.round(tpi_d * -inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_d * -inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_d * -inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_d * -inches) + rr.getCurrentPosition()));
         }
-        else if (direct == dirrection.right) {
+        else if (direct == direction.right) {
             fl.setTargetPosition((int)(Math.round(tpi_s * inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_s * -inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_s * -inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_s * inches) + rr.getCurrentPosition()));
         }
-        else if (direct == dirrection.left) {
+        else if (direct == direction.left) {
             fl.setTargetPosition((int)(Math.round(tpi_s * -inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_s * inches) + fr.getCurrentPosition()));
             rl.setTargetPosition((int)(Math.round(tpi_s * inches) + rl.getCurrentPosition()));
@@ -70,6 +73,10 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
             ap.setTargetPosition(0);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
+        if (positionPitch == armPositionsPitch.middle) {
+            ap.setTargetPosition(ticksMiddlePitch);
+            ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
         else if (positionPitch == armPositionsPitch.output) {
             ap.setTargetPosition(ticksHighPitch);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -80,6 +87,13 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
         }
         else if (positionPitch == armPositionsPitch.duckPos) {
             ap.setTargetPosition(-2200);
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+        else if (positionPitch == armPositionsPitch.up) {
+            ap.setTargetPosition(-5000);
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }else if (positionPitch == armPositionsPitch.lvl1) {
+            ap.setTargetPosition(-519);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         if (positionYaw == armPositionsYaw.start) {
@@ -103,17 +117,13 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
     }
     public void armPosDegree(int positionPitch, int speedPitch, int positionYaw, int speedYaw) {
         if (positionPitch != 0) {
-            ap.setTargetPosition(2850 * positionPitch / 360);
+            ap.setTargetPosition(-18043 * positionPitch / 360);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(speedPitch);
-            ar.setVelocity(speedYaw);
         }
         if (positionYaw != 0) {
             ar.setTargetPosition(2850 * positionYaw / 360);
-            ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ap.setVelocity(speedPitch);
             ar.setVelocity(speedYaw);
         }
     }
@@ -125,9 +135,12 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
         rr = hardwareMap.get(DcMotorEx.class, "rr");
         ar = hardwareMap.get(DcMotorEx.class, "ar");
         ap = hardwareMap.get(DcMotorEx.class, "ap");
+        led = hardwareMap.get(DcMotor.class, "B1");
         cs1 = hardwareMap.get(CRServo.class, "cs1");
         cs2 = hardwareMap.get(CRServo.class, "cs2");
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
+        tsleft = hardwareMap.get(TouchSensor.class, "tsleft");
+        tsright = hardwareMap.get(TouchSensor.class, "tsright");
         ElapsedTime timerBreak = new ElapsedTime();
         ar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -141,6 +154,7 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setDirection(DcMotorSimple.Direction.REVERSE); rl.setDirection(DcMotorSimple.Direction.REVERSE);
         Globals.setupIMU(hardwareMap);
         telemetry.addLine("Injecting Dark Matter Automatically...");
         telemetry.update();
@@ -149,10 +163,33 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
         telemetry.addLine("Injecting Dark Matter Automatically...");
         telemetry.addLine("The world is automatically being consumed...");
         telemetry.update();
-        fl.setDirection(DcMotorSimple.Direction.REVERSE); rl.setDirection(DcMotorSimple.Direction.REVERSE);
-        runInches(25, dirrection.left, 750);
-        sleep(500);
-        armPos(armPositionsPitch.output, 2000, armPositionsYaw.current, 0);
+        led.setPower(1);
+        runInches(25, direction.left, 750);
+        sleep(300);
+        armPos(armPositionsPitch.middle, 2200, armPositionsYaw.current, 0);
+        timerBreak.reset();
+        while (timerBreak.milliseconds() < 2600) {
+            telemetry.addData("FL", fl.getCurrentPosition());
+            telemetry.addData("FR", fr.getCurrentPosition());
+            telemetry.addData("RL", rl.getCurrentPosition());
+            telemetry.addData("RR", rr.getCurrentPosition());
+            telemetry.addData("AR", ar.getCurrentPosition());
+            telemetry.addData("AP", ap.getCurrentPosition());
+            telemetry.update();
+        }
+        armPosDegree(0, 0, -60, 1000);
+        if (!tsleft.isPressed() && !tsright.isPressed()) {
+            runInches(6, direction.right, 800);
+            armPos(armPositionsPitch.lvl1, 2200, armPositionsYaw.current, 0);
+            sleep(1100);
+            armPosDegree(0, 0, -123, 550);
+        }
+        else if (tsleft.isPressed() && !tsright.isPressed()) {
+            armPos(armPositionsPitch.middle, 2200, armPositionsYaw.current, 0);
+        }
+        else {
+            armPos(armPositionsPitch.output, 2200, armPositionsYaw.current, 0);
+        }
         timerBreak.reset();
         while (timerBreak.milliseconds() < 3500) {
             telemetry.addData("FL", fl.getCurrentPosition());
@@ -163,18 +200,33 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
             telemetry.addData("AP", ap.getCurrentPosition());
             telemetry.update();
         }
-//        armPos(armPositionsPitch.output, 2000, armPositionsYaw.degree90, 800);
-//        timerBreak.reset();
-//        while (timerBreak.milliseconds() < 2000) {
-//            telemetry.addData("FL", fl.getCurrentPosition());
-//            telemetry.addData("FR", fr.getCurrentPosition());
-//            telemetry.addData("RL", rl.getCurrentPosition());
-//            telemetry.addData("RR", rr.getCurrentPosition());
-//            telemetry.addData("AR", ar.getCurrentPosition());
-//            telemetry.addData("AP", ap.getCurrentPosition());
-//            telemetry.update();
-//        }
-        armPosDegree(0, 0, -111,500);
+        if (tsleft.isPressed() || tsright.isPressed()) {
+            armPosDegree(0, 0, -111,500);
+            timerBreak.reset();
+            while (timerBreak.milliseconds() < 2200) {
+                telemetry.addData("FL", fl.getCurrentPosition());
+                telemetry.addData("FR", fr.getCurrentPosition());
+                telemetry.addData("RL", rl.getCurrentPosition());
+                telemetry.addData("RR", rr.getCurrentPosition());
+                telemetry.addData("AR", ar.getCurrentPosition());
+                telemetry.addData("AP", ap.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+        cs1.setPower(-0.5);
+        cs2.setPower(0.5);
+        sleep(1300);
+        cs1.setPower(0);
+        cs2.setPower(0);
+        sleep(500);
+        if (tsleft.isPressed() || tsright.isPressed()) {
+            runInches(35, direction.right, 920);
+        }
+        else {
+            runInches(30, direction.right, 920);
+        }
+        sleep(700);
+        armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree270, 1000);
         timerBreak.reset();
         while (timerBreak.milliseconds() < 2200) {
             telemetry.addData("FL", fl.getCurrentPosition());
@@ -185,28 +237,10 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
             telemetry.addData("AP", ap.getCurrentPosition());
             telemetry.update();
         }
-        cs1.setPower(-0.75);
-        cs2.setPower(0.4);
-        sleep(1000);
-        cs1.setPower(0);
-        cs2.setPower(0);
-        runInches(35, dirrection.right, 750);
-        sleep(500);
-        armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree270, 800);
-        timerBreak.reset();
-        while (timerBreak.milliseconds() < 3200) {
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("RL", rl.getCurrentPosition());
-            telemetry.addData("RR", rr.getCurrentPosition());
-            telemetry.addData("AR", ar.getCurrentPosition());
-            telemetry.addData("AP", ap.getCurrentPosition());
-            telemetry.update();
-        }
-        runInches(20, dirrection.backward, 750);
-        sleep(500);
+        runInches(20, direction.backward, 900);
         armPos(armPositionsPitch.intake, 2000, armPositionsYaw.current, 0);
-        while ((ar.isBusy() || ap.isBusy() || fl.isBusy() || fr.isBusy() || rl.isBusy() || rr.isBusy()) && opModeIsActive()) {
+        timerBreak.reset();
+        while (timerBreak.milliseconds() < 2000) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());
             telemetry.addData("RL", rl.getCurrentPosition());
@@ -222,15 +256,6 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
         cs1.setPower(0.75);
         cs2.setPower(-0.4);
         int prevCurrent = fl.getCurrentPosition();
-        while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("RL", rl.getCurrentPosition());
-            telemetry.addData("RR", rr.getCurrentPosition());
-            telemetry.addData("AR", ar.getCurrentPosition());
-            telemetry.addData("AP", ap.getCurrentPosition());
-            telemetry.update();
-        }
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -260,7 +285,7 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
             cs2.setPower(0);
             armPos(armPositionsPitch.output, 2200, armPositionsYaw.degree180, 800);
             sleep(100);
-            runInches((int)Math.round((prevCurrent - fl.getCurrentPosition()) / tpi_d + 55), dirrection.forward, 750);
+            runInches((int)Math.round((prevCurrent - fl.getCurrentPosition()) / tpi_d + 44), direction.forward, 1000);
             timerBreak.reset();
             while (timerBreak.milliseconds() < 3500) {
                 telemetry.addData("FL", fl.getCurrentPosition());
@@ -271,9 +296,9 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
                 telemetry.addData("AP", ap.getCurrentPosition());
                 telemetry.update();
             }
-            runInches(18, dirrection.left, 750);
+            runInches(18, direction.left, 900);
             timerBreak.reset();
-            while (timerBreak.milliseconds() < 2300) {
+            while (timerBreak.milliseconds() < 1500) {
                 telemetry.addData("FL", fl.getCurrentPosition());
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
@@ -282,16 +307,16 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
                 telemetry.addData("AP", ap.getCurrentPosition());
                 telemetry.update();
             }
-            cs1.setPower(-0.75);
-            cs2.setPower(0.4);
+            cs1.setPower(-0.5);
+            cs2.setPower(0.5);
             sleep(1000);
             cs1.setPower(0);
             cs2.setPower(0);
-            runInches(23, dirrection.right, 750);
+            runInches(23, direction.right, 900);
             sleep(500);
-            armPos(armPositionsPitch.up, 2000, armPositionsYaw.degree270, 800);
+            armPos(armPositionsPitch.up, 2200, armPositionsYaw.degree270, 900);
             timerBreak.reset();
-            while (timerBreak.milliseconds() < 2500) {
+            while (timerBreak.milliseconds() < 1500) {
                 telemetry.addData("FL", fl.getCurrentPosition());
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
@@ -300,9 +325,9 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
                 telemetry.addData("AP", ap.getCurrentPosition());
                 telemetry.update();
             }
-            runInches(51, dirrection.backward, 750);
+            runInches(51, direction.backward, 1100);
             timerBreak.reset();
-            while (timerBreak.milliseconds() < 3200) {
+            while (timerBreak.milliseconds() < 3000) {
                 telemetry.addData("FL", fl.getCurrentPosition());
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
@@ -324,5 +349,10 @@ public class DarkMatterAutoConsumer_DropOffBLUEleft extends LinearOpMode {
             cs2.setPower(0);
             armPos(armPositionsPitch.low, 2000, armPositionsYaw.current, 0);
         }
+        led.setPower(0);
+        fl.setPower(0);
+        fr.setPower(0);
+        rl.setPower(0);
+        rr.setPower(0);
     }
 }

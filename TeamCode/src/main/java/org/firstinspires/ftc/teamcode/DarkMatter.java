@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -140,10 +141,15 @@ public class DarkMatter extends LinearOpMode {
     //
     public void inputOutputControl() {
         //Duck Spin
-        if (gamepad2.guide) {
+        if (gamepad2.right_stick_x > 0.05) {
             runningInput = false;
             cs1.setPower(-1);
             cs2.setPower(-1);
+        }
+        else if (gamepad2.right_stick_x < -0.05) {
+            runningInput = false;
+            cs1.setPower(1);
+            cs2.setPower(1);
         }
         //Runs servos to output item
         else if (gamepad2.right_trigger > 0.05) {
@@ -176,7 +182,7 @@ public class DarkMatter extends LinearOpMode {
     @Override
     //OpMode
     public void runOpMode() {
-        //Setting variables
+        //Setting variables and Init
         fl = hardwareMap.get(DcMotorEx.class, "fl");
         fr = hardwareMap.get(DcMotorEx.class, "fr");
         rl = hardwareMap.get(DcMotorEx.class, "rl");
@@ -192,18 +198,16 @@ public class DarkMatter extends LinearOpMode {
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Globals.setupIMU(hardwareMap);
-        telemetry.addLine("Injecting Dark Matter...");
+        telemetry.addLine("Waiting For Init...");
         telemetry.update();
-        //Waits for start of OpMode
-        waitForStart();
-        telemetry.addLine("Injecting Dark Matter...");
-        telemetry.addLine("The world is consumed...");
-        telemetry.update();
-        fl.setDirection(DcMotorSimple.Direction.REVERSE); rl.setDirection(DcMotorSimple.Direction.REVERSE);
+        fl.setDirection(DcMotorSimple.Direction.REVERSE);
+        rl.setDirection(DcMotorSimple.Direction.REVERSE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //Waits for start of OpMode
+        waitForStart();
         cp1 = new Gamepad();
         cp2 = new Gamepad();
         ElapsedTime tm1 = new ElapsedTime();
@@ -290,22 +294,8 @@ public class DarkMatter extends LinearOpMode {
                 rl.setVelocity(0);
                 rr.setVelocity(0);
             }
-            // Turns left
-            if (gamepad1.left_trigger > 0.4) {
-                fl.setPower(-0.8);
-                fr.setPower(0.8);
-                rl.setPower(-0.8);
-                rr.setPower(0.8);
-            }
-            // Turns right
-            if (gamepad1.right_trigger > 0.4) {
-                fl.setPower(0.8);
-                fr.setPower(-0.8);
-                rl.setPower(0.8);
-                rr.setPower(-0.8);
-            }
             //Speeds
-            if (gamepad1.b) {
+            if (gamepad1.right_bumper) {
                 driveSpeed = 0.5;
                 turningspeed = 0.333;
             }
@@ -313,13 +303,13 @@ public class DarkMatter extends LinearOpMode {
                 driveSpeed = 1;
                 turningspeed = 0.5;
             }
+            //Arm control
             armPitch();
             armRotation();
             inputOutputControl();
             if (ts2.isPressed()) {
                 pressed = true;
             }
-
             //Resets position 0
             if (pressed && !ts2.isPressed()) {
                 ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
