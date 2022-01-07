@@ -113,6 +113,8 @@ public class DarkMatter extends LinearOpMode {
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
             runningInput = true;
+            cs1.setPower(0.55);
+            cs2.setPower(-0.55);
         }
         //Level 3 shipping hub position
         else if (gamepad2.y) {
@@ -122,7 +124,7 @@ public class DarkMatter extends LinearOpMode {
         }
         //Duck position
         else if (gamepad2.x) {
-            ap.setTargetPosition(-2200);
+            ap.setTargetPosition(-1970);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
         }
@@ -153,14 +155,14 @@ public class DarkMatter extends LinearOpMode {
         }
         //Runs servos to output item
         else if (gamepad2.right_trigger > 0.05) {
-            cs1.setPower(-0.75);
-            cs2.setPower(0.395);
+            cs1.setPower(-0.4);
+            cs2.setPower(0.4);
             runningInput = false;
         }
         //Runs servos to input item
         else if (!ts1.isPressed() && gamepad2.right_bumper) {
-            cs1.setPower(0.50);
-            cs2.setPower(-0.35);
+            cs1.setPower(0.55);
+            cs2.setPower(-0.55);
             runningInput = true;
         }
         // If none, sets power to 0

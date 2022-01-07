@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @Autonomous(name="BLUE PARK: RIGHT")
-public class DarkMatterAutoConsumer_PARKBLUE extends LinearOpMode {
+public class PARKBLUE extends LinearOpMode {
     //Global Variables
     //Ticks For Yaw: 2850 * angle / 360
     DcMotorEx fl;
