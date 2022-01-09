@@ -21,6 +21,9 @@ public class EncoderStuff extends LinearOpMode {
         robot.getLifter().setPower(0);
         robot.getLifter().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        robot.getArm().setPower(0);
+        robot.getArm().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         FtcDashboard dashboard = FtcDashboard.getInstance();
         TelemetryPacket packet = new TelemetryPacket();
 
@@ -31,6 +34,7 @@ public class EncoderStuff extends LinearOpMode {
         while (opModeIsActive()) {
             // TeleOp loop
             packet.put("Lifter", robot.getLifter().getCurrentPosition());
+            packet.put("Arm", robot.getArm().getCurrentPosition());
             dashboard.sendTelemetryPacket(packet);
 
             robot.getLifter().setPower(gamepad1.left_stick_y);

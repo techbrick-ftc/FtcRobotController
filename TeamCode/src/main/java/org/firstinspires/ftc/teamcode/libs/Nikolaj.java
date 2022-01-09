@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.libs;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
@@ -17,9 +18,10 @@ public class Nikolaj {
     private DcMotor rrMotor;
 
     private DcMotor lifter;
+    private DcMotor arm;
 
-    private CRServo intake;
-    private CRServo spinner;
+    private CRServo lSrv;
+    private CRServo rSrv;
 
     private TouchSensor touch;
 
@@ -30,15 +32,21 @@ public class Nikolaj {
         rrMotor = hardwareMap.get(DcMotor.class, "rightRear");
 
         lifter = hardwareMap.get(DcMotor.class, "lifter");
+        arm = hardwareMap.get(DcMotor.class, "arm");
         lifter.setMode(STOP_AND_RESET_ENCODER);
         lifter.setMode(RUN_USING_ENCODER);
-        lifter.setZeroPowerBehavior(BRAKE);
+        lifter.setDirection(REVERSE);
+        arm.setTargetPosition(0);
+        arm.setMode(RUN_TO_POSITION);
+        arm.setZeroPowerBehavior(BRAKE);
 
-        intake = hardwareMap.get(CRServo.class, "servo0");
-        spinner = hardwareMap.get(CRServo.class, "servo1");
 
-        intake.setDirection(REVERSE);
-        spinner.setDirection(REVERSE);
+        lSrv = hardwareMap.get(CRServo.class, "servo0");
+        rSrv = hardwareMap.get(CRServo.class, "servo1");
+
+        frMotor.setDirection(REVERSE);
+        rlMotor.setDirection(REVERSE);
+        rSrv.setDirection(REVERSE);
 
         touch = hardwareMap.get(TouchSensor.class, "touch");
     }
@@ -49,9 +57,10 @@ public class Nikolaj {
     public DcMotor rrMotor() { return this.rrMotor; }
 
     public DcMotor getLifter() { return lifter; }
+    public DcMotor getArm() { return arm; }
 
-    public CRServo getIntake() { return intake; }
-    public CRServo getSpinner() { return spinner; }
+    public CRServo getLSrv() { return lSrv; }
+    public CRServo getRSrv() { return rSrv; }
 
     public TouchSensor getTouch() { return touch; }
 }

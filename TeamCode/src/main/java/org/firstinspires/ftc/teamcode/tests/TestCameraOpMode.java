@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.spartronics4915.lib.T265Camera;
 
 import static java.lang.Math.PI;
+import static java.lang.Thread.sleep;
 
 import android.util.Log;
 
@@ -20,6 +21,7 @@ public class TestCameraOpMode extends OpMode
 {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
+    private static boolean slamraSet = false;
     private final String TAG = "TestCameraOpMode";
 
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -27,10 +29,9 @@ public class TestCameraOpMode extends OpMode
     @Override
     public void init() {
         if (slamra == null) {
-            slamra = new T265Camera(new Transform2d(new Translation2d(0, 6 * 0.0256), new Rotation2d(0)), 0.1, hardwareMap.appContext);
+            slamra = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
             Log.v(TAG, "slamra initialized");
         }
-        // slamra.setPose(new Pose2d(0, 0, new Rotation2d(0)));
     }
 
     @Override
@@ -40,6 +41,14 @@ public class TestCameraOpMode extends OpMode
     @Override
     public void start() {
         slamra.start();
+        try { sleep(300); } catch (InterruptedException ignored) {}
+        if (!slamraSet) { slamra.setPose(new Pose2d(0, 0, new Rotation2d(0))); slamraSet = true; }
+        /*
+            The setPose function gets the reference position (for rotation) from the library itself,
+            after the library has applied the previous rotation which makes the setPose function
+            negate itself. Basically.
+         */
+        slamra.getLastReceivedCameraUpdate();
     }
 
     @Override
@@ -71,7 +80,10 @@ public class TestCameraOpMode extends OpMode
 
     @Override
     public void stop() {
-        slamra.stop();
+        if (slamra.isStarted()) {
+            slamra.stop();
+            slamra.getLastReceivedCameraUpdate();
+        }
     }
 
 }

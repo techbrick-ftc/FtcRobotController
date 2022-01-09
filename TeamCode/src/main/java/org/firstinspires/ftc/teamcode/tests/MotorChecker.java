@@ -8,10 +8,10 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 @Autonomous(name = "Motor Checker", group = "Tests")
 public class MotorChecker extends LinearOpMode {
     public void runOpMode() {
-        DcMotor fl = hardwareMap.get(DcMotor.class, "fl");
-        DcMotor fr = hardwareMap.get(DcMotor.class, "fr");
-        DcMotor rl = hardwareMap.get(DcMotor.class, "rl");
-        DcMotor rr = hardwareMap.get(DcMotor.class, "rr");
+        DcMotor fl = hardwareMap.get(DcMotor.class, "0");
+        DcMotor fr = hardwareMap.get(DcMotor.class, "1");
+        DcMotor rl = hardwareMap.get(DcMotor.class, "2");
+        DcMotor rr = hardwareMap.get(DcMotor.class, "3");
 
         fr.setDirection(REVERSE);
 
