@@ -54,6 +54,11 @@ public class NewMain extends LinearOpMode {
 
         int armPos, armPrevP;
         armPos = armPrevP = 0;
+        int midArmL = 106;
+        int midArmR = -68;
+        int sideArmL = 276;
+        int sideArmR = -257;
+        int armMax = 350;
 
         // Lifter positions
         int lifterMin =     0;
@@ -68,7 +73,7 @@ public class NewMain extends LinearOpMode {
         double slowerSpeed = .5;
 
         // Toast notification because I can
-        AppUtil.getInstance().showToast(UILocation.BOTH, "Ver 2 Iteration 0.1-0.0");
+        AppUtil.getInstance().showToast(UILocation.BOTH, "Ver 2 Iteration 0.1-2.0");
         waitForStart(); // This function halts the program until you press start
 
         // Pre-run
@@ -87,21 +92,20 @@ public class NewMain extends LinearOpMode {
             if (gamepad1.back) { drive.resetAngle(); }
 
             lifterPower = -gamepad2.left_stick_y;
-            int curPos = robot.getLifter().getCurrentPosition();
+            int lifterCur = robot.getLifter().getCurrentPosition();
             if (lifterMoving) {
                 if (lifterPower > 0.1 || lifterPower < -0.1) { lifterMoving = false; }
-                if (curPos > 6653) { lifterPower = -1; }
-                else if (curPos > 6652) { lifterMoving = false; lifterPower = 0; }
-                else if (curPos < 6651) { lifterPower = 1; }
-            } else if (curPos < lifterMid + 2) {
-            } else if (curPos > lifterMax - 2) {
+                if (lifterCur > 6653) { lifterPower = -1; }
+                else if (lifterCur > 6652) { lifterMoving = false; lifterPower = 0; }
+                else if (lifterCur < 6651) { lifterPower = 1; }
+            } else if (lifterCur > lifterMax - 2) {
                 lifterPower = clamp(-1, 0, lifterPower);
-            } else if (curPos < lifterMin + 2) {
+            } else if (lifterCur < lifterMin + 2) {
                 lifterPower = clamp(0, 1, lifterPower);
-            }
-            
-            if (gamepad2.y && !cp2.y) {
-                lifterMoving = !lifterMoving;
+            } else if (lifterCur < lifterMid + 3 && lifterCur > lifterMid - 2 &&
+                        ((armPos < sideArmL && armPos > midArmL) ||
+                                (armPos < midArmR && armPos > sideArmR))) {
+                lifterPower = clamp(0, 1, lifterPower);
             }
 
             if (intaking == 0 && gamepad2.a && !cp2.a) {
@@ -125,8 +129,8 @@ public class NewMain extends LinearOpMode {
             }
 
             if (gamepad2.right_bumper && !gamepad2.left_bumper) {
-                rSrvPower = 1;
-                lSrvPower = 0;
+                lSrvPower = 1;
+                rSrvPower = 0;
                 intaking = 0;
             } else if (gamepad2.left_bumper && !gamepad2.right_bumper) {
                 lSrvPower = 0;
@@ -137,8 +141,27 @@ public class NewMain extends LinearOpMode {
                 rSrvPower = 0;
             }
 
-            armPos += (int) gamepad2.right_stick_x * 100;
+            armPos += -Math.round(gamepad2.right_stick_x) * 3;
+            int armCur = robot.getArm().getCurrentPosition();
 
+            if (lifterCur <= lifterMid + 2) {
+                if (armCur < midArmL && armCur > midArmR) {
+                    armPos = (int) clamp(midArmR, midArmL, armPos);
+                } else if (armCur > midArmL + 10) {
+                    armPos = (int) clamp(sideArmL, armMax, armPos);
+                } else if (armCur < midArmR - 10) {
+                    armPos = (int) clamp(-armMax, sideArmR, armPos);
+                }
+            } else {
+                armPos = (int) clamp(-350, 350, armPos);
+            }
+
+            if (gamepad2.y && !cp2.y) {
+                lifterMoving = !lifterMoving;
+            }
+
+            telemetry.addData("Current Arm Position", armPos);
+            telemetry.update();
 
             if (gamepad1.x && !cp1.x) { slower = !slower; }
 

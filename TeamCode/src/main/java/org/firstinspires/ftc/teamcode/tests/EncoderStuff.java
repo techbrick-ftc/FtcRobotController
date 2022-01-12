@@ -19,9 +19,11 @@ public class EncoderStuff extends LinearOpMode {
         robot.setup(hardwareMap);
 
         robot.getLifter().setPower(0);
+        robot.getLifter().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.getLifter().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         robot.getArm().setPower(0);
+        robot.getArm().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.getArm().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();

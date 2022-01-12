@@ -36,9 +36,11 @@ public class Nikolaj {
         lifter.setMode(STOP_AND_RESET_ENCODER);
         lifter.setMode(RUN_USING_ENCODER);
         lifter.setDirection(REVERSE);
+        lifter.setZeroPowerBehavior(BRAKE);
         arm.setTargetPosition(0);
         arm.setMode(RUN_TO_POSITION);
         arm.setZeroPowerBehavior(BRAKE);
+        arm.setPower(1);
 
 
         lSrv = hardwareMap.get(CRServo.class, "servo0");
@@ -46,7 +48,6 @@ public class Nikolaj {
 
         frMotor.setDirection(REVERSE);
         rlMotor.setDirection(REVERSE);
-        rSrv.setDirection(REVERSE);
 
         touch = hardwareMap.get(TouchSensor.class, "touch");
     }
