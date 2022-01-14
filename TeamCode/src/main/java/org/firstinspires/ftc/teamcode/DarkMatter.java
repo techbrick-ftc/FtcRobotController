@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -30,7 +29,6 @@ public class DarkMatter extends LinearOpMode {
     CRServo cs2;
     TouchSensor ts1;
     TouchSensor ts2;
-    Camera camera;
     DcMotorEx led;
     double angle = Math.PI/2;
     double driveSpeed = 1.00;
@@ -124,13 +122,13 @@ public class DarkMatter extends LinearOpMode {
         }
         //Duck position
         else if (gamepad2.x) {
-            ap.setTargetPosition(-1970);
+            ap.setTargetPosition(-2022);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
         }
         //Shared shipping hub position
         else if (gamepad2.b && !gamepad2.start && !gamepad1.start) {
-            ap.setTargetPosition(-800);
+            ap.setTargetPosition(-875);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
         }
@@ -155,8 +153,8 @@ public class DarkMatter extends LinearOpMode {
         }
         //Runs servos to output item
         else if (gamepad2.right_trigger > 0.05) {
-            cs1.setPower(-0.4);
-            cs2.setPower(0.4);
+            cs1.setPower(-0.3);
+            cs2.setPower(0.3);
             runningInput = false;
         }
         //Runs servos to input item
@@ -172,8 +170,8 @@ public class DarkMatter extends LinearOpMode {
         }
         //If item presses button or arm driver presses right trigger
         else if (ts1.isPressed() && runningInput) {
-            cs1.setPower(-0.1);
-            cs2.setPower(0.1);
+//            cs1.setPower(-0.1);
+//            cs2.setPower(0.1);
             runningInput = false;
             sleep(4);
             cs1.setPower(0);
@@ -196,7 +194,7 @@ public class DarkMatter extends LinearOpMode {
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         ts2 = hardwareMap.get(TouchSensor.class, "ts2");
         led = hardwareMap.get(DcMotorEx.class, "B1");
-        DcMotor[] all = {fl, fr, rl, rr, ap, ar};
+        DcMotor[] all = {fl, fr, rl, rr, ap, ar, led};
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Globals.setupIMU(hardwareMap);
