@@ -34,7 +34,6 @@ public class DarkMatter extends LinearOpMode {
     double driveSpeed = 1.00;
     double turningspeed = 0.5;
     boolean runningInput = false;
-    boolean duckControl = false;
     boolean pressed = false;
     boolean fieldCentric = true;
     boolean driveAllowed;
