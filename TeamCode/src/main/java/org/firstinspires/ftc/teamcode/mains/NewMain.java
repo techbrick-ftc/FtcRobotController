@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
 
-@TeleOp(name="",group="")
+@TeleOp(name="Main",group="")
 public class NewMain extends LinearOpMode {
     // Pre-init
     private final Nikolaj robot = new Nikolaj(); // Library with robot config
@@ -29,7 +29,7 @@ public class NewMain extends LinearOpMode {
         // Init
         robot.setup(hardwareMap); // Initializes the config
 
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu1");
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters params = new BNO055IMU.Parameters();
         params.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -61,7 +61,7 @@ public class NewMain extends LinearOpMode {
         int armMax = 350;
 
         // Lifter positions
-        int lifterMin =     0;
+        int lifterMin =   376;
         int lifterMid =   971;
         int lifterMax = 11935;
         boolean lifterMoving = false;
@@ -86,7 +86,7 @@ public class NewMain extends LinearOpMode {
             drive.Drive(
                     !slower ? -gamepad1.left_stick_x : -gamepad1.left_stick_x * slowerSpeed,
                     !slower ? gamepad1.left_stick_y : gamepad1.left_stick_y * slowerSpeed,
-                    !slower ? -gamepad1.right_stick_x : -gamepad1.right_stick_x * slowerSpeed
+                    !slower ?-gamepad1.right_stick_x * 0.6 : gamepad1.right_stick_x * slowerSpeed * 0.6
             );
 
             if (gamepad1.back) { drive.resetAngle(); }
@@ -142,16 +142,16 @@ public class NewMain extends LinearOpMode {
             }
 
             armPos += -Math.round(gamepad2.right_stick_x) * 3;
-            int armCur = robot.getArm().getCurrentPosition();
+//            int armCur = robot.getArm().getCurrentPosition();
 
             if (lifterCur <= lifterMid + 2) {
-                if (armCur < midArmL && armCur > midArmR) {
-                    armPos = (int) clamp(midArmR, midArmL, armPos);
-                } else if (armCur > midArmL + 10) {
-                    armPos = (int) clamp(sideArmL, armMax, armPos);
-                } else if (armCur < midArmR - 10) {
-                    armPos = (int) clamp(-armMax, sideArmR, armPos);
-                }
+//                if (armCur < midArmL && armCur > midArmR) {
+//                    armPos = (int) clamp(midArmR, midArmL, armPos);
+//                } else if (armCur > midArmL + 10) {
+//                    armPos = (int) clamp(sideArmL, armMax, armPos);
+//                } else if (armCur < midArmR - 10) {
+//                    armPos = (int) clamp(-armMax, sideArmR, armPos);
+//                }
             } else {
                 armPos = (int) clamp(-350, 350, armPos);
             }
@@ -169,6 +169,11 @@ public class NewMain extends LinearOpMode {
             if (armPos != armPrevP) { robot.getArm().setTargetPosition(armPos); armPrevP = armPos; }
             if (lSrvPower != lSrvPrevP) { robot.getLSrv().setPower(lSrvPower); lSrvPrevP = lSrvPower; }
             if (rSrvPower != rSrvPrevP) { robot.getRSrv().setPower(rSrvPower); rSrvPrevP = rSrvPower; }
+
+            try {
+                cp1.copy(gamepad1);
+                cp2.copy(gamepad2);
+            } catch (Exception ignored) {}
         }
     }
 

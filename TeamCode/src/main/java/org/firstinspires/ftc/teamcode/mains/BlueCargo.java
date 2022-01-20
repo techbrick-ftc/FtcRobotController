@@ -36,7 +36,7 @@ public class BlueCargo extends LinearOpMode {
         // Pre-run
         slamera.start();
         sleep(300);
-        slamera.setPose(new Pose2d((-63 * 0.0254), (2 * 0.0254), new Rotation2d(0.0)));
+        slamera.setPose(new Pose2d((2. * 0.0254), (-63. * 0.0254), new Rotation2d(0.)));
 
         slamera.getLastReceivedCameraUpdate();
 

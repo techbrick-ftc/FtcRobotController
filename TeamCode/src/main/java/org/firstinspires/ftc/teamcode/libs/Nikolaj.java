@@ -43,8 +43,8 @@ public class Nikolaj {
         arm.setPower(1);
 
 
-        lSrv = hardwareMap.get(CRServo.class, "servo0");
-        rSrv = hardwareMap.get(CRServo.class, "servo1");
+        lSrv = hardwareMap.get(CRServo.class, "servo1");
+        rSrv = hardwareMap.get(CRServo.class, "servo0");
 
         frMotor.setDirection(REVERSE);
         rlMotor.setDirection(REVERSE);

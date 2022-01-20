@@ -173,11 +173,11 @@ public class EasyOpenCVImportable {
             sum1 = (int) Core.mean(region1_Cb).val[0];
             sum2 = (int) Core.mean(region2_Cb).val[0];
 
-            if (sum1 > 200) {
+            if (sum1 < 110) {
                 this.position = 0;
-            } else if (sum2 > 200) {
+            } else if (sum2 < 110) {
                 this.position = 1;
-            } else if (sum1 < 200 && sum2 < 200) {
+            } else if (sum1 > 78 && sum2 > 78) {
                 this.position = 2;
             }
 
