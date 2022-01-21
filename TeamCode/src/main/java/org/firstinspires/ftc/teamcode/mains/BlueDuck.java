@@ -14,14 +14,12 @@ import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.teamcode.libs.EasyOpenCVImportable;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
-import org.firstinspires.ftc.teamcode.libs.TeleAuto;
-import org.firstinspires.ftc.teamcode.tests.RobotConfig;
 
 @Autonomous()
 public class BlueDuck extends LinearOpMode {
     private final Nikolaj robot = new Nikolaj();
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
-    private TelemetryPacket packet = new TelemetryPacket();
+    private TelemetryPacket initPacket = new TelemetryPacket();
     private final EasyOpenCVImportable camera = new EasyOpenCVImportable();
     private T265Camera slamera;
 
@@ -40,37 +38,25 @@ public class BlueDuck extends LinearOpMode {
             telemetry.addData("Camera normalized", et.seconds() > 4);
             telemetry.update();
 
-            packet.put("Time in init", et.milliseconds() / 1000);
-            packet.put("Camera normalized", et.seconds() > 4);
-            dashboard.sendTelemetryPacket(packet);
+            initPacket.put("Time in init", et.milliseconds() / 1000);
+            initPacket.put("Camera normalized", et.seconds() > 4);
+            dashboard.sendTelemetryPacket(initPacket);
         }
 
         slamera.start();
-        slamera.setPose(new Pose2d((-35. * 0.0254), (-63. * 0.0254), new Rotation2d(0.)));
+        slamera.setPose(new Pose2d((-35.0 * 0.0254), (63.0 * 0.0254), new Rotation2d(0.0)));
 
         if (opModeIsActive()) {
             // TeleOp loop
-            while (camera.getDetection() == -1 && opModeIsActive()) {
-                int[] analysis = camera.getAnalysis();
-                int detection = camera.getDetection();
-
-                packet.put("avg1 (blue)", analysis[0]);
-                packet.put("avg2 (green)", analysis[1]);
-                packet.put("Object Position", detection);
-                dashboard.sendTelemetryPacket(packet);
-
-                telemetry.addData("Object Position", detection);
-                telemetry.update();
-            }
-
-            packet = new TelemetryPacket();
+            while (camera.getDetection() == -1 && opModeIsActive()) { idle(); }
 
             while (opModeIsActive()) {
                 final int robotRadius = 9; // inches
+                TelemetryPacket packet = new TelemetryPacket();
                 Canvas field = packet.fieldOverlay();
 
                 T265Camera.CameraUpdate up = slamera.getLastReceivedCameraUpdate();
-                if (up == null) return;
+                if (up == null) continue;
 
                 // We divide by 0.0254 to convert meters to inches
                 Translation2d translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
@@ -86,11 +72,20 @@ public class BlueDuck extends LinearOpMode {
                 packet.put("Y", translation.getY());
                 packet.put("Angle", rotation.getRadians());
 
+                telemetry.addData("X", translation.getX());
+                telemetry.addData("Y", translation.getY());
+                telemetry.addData("Angle", rotation.getRadians());
+                telemetry.update();
+
                 packet.put("Final pos", camera.getDetection());
                 dashboard.sendTelemetryPacket(packet);
             }
         }
         camera.stopDetection();
         slamera.stop();
+        slamera.free();
+        telemetry.addLine("Freed camera");
+        telemetry.update();
+        System.out.println("Freed camera");
     }
 }
