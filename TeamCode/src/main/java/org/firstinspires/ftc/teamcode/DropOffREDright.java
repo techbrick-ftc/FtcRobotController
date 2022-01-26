@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
 @Autonomous(name="RED DROP OFF: RIGHT")
-public class DropOffREDleft extends LinearOpMode {
+public class DropOffREDright extends LinearOpMode {
     //Global Variables
     //Ticks For Yaw: 2850 * angle / 360
     DcMotorEx fl;
@@ -29,7 +29,7 @@ public class DropOffREDleft extends LinearOpMode {
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
     final int ticksHighPitch = -3100;
-    final int ticksMiddlePitch = -1575;
+    final int ticksMiddlePitch = -1600;
     final int ticksLowPitch = -800;
     final int ticksDegree90Yaw = -712;
     final int ticksDegree270Yaw = -2138;

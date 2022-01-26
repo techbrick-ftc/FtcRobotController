@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
-@Autonomous(name="BLUE DROP OFF: LEFT")
-public class DropOffBLUEleft extends LinearOpMode {
+@Autonomous(name="RED DROP OFF: RIGHT 3 blocks")
+public class DropOffREDright3blocks extends LinearOpMode {
     //Global Variables
     //Ticks For Yaw: 2850 * angle / 360
     DcMotorEx fl;
@@ -29,7 +29,7 @@ public class DropOffBLUEleft extends LinearOpMode {
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
     final int ticksHighPitch = -3100;
-    final int ticksMiddlePitch = -1600;
+    final int ticksMiddlePitch = -1575;
     final int ticksLowPitch = -800;
     final int ticksDegree90Yaw = -712;
     final int ticksDegree270Yaw = -2138;
@@ -73,7 +73,7 @@ public class DropOffBLUEleft extends LinearOpMode {
             ap.setTargetPosition(0);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        if (positionPitch == armPositionsPitch.middle) {
+        else if (positionPitch == armPositionsPitch.middle) {
             ap.setTargetPosition(ticksMiddlePitch);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
@@ -111,6 +111,10 @@ public class DropOffBLUEleft extends LinearOpMode {
         }
         else if (positionYaw == armPositionsYaw.degree270) {
             ar.setTargetPosition(ticksDegree270Yaw);
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+        else if (positionYaw == armPositionsYaw.degree225) {
+            ar.setTargetPosition((int) 2850 * -225 / 360);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         ap.setVelocity(speedPitch);
@@ -169,25 +173,25 @@ public class DropOffBLUEleft extends LinearOpMode {
         sleep(200);
         armPos(armPositionsPitch.middle, 2500, armPositionsYaw.current, 0);
         sleep(300);
-        armPosDegree(0, 0, -60, 1000);
+        armPosDegree(0, 0, -180, 1000);
         sleep(1500);
-        if (!tsleft.isPressed() && !tsright.isPressed()) {
+        if (tsleft.isPressed() && !tsright.isPressed()) {
             runInches(6, direction.right, 800);
             armPos(armPositionsPitch.lvl1, 2200, armPositionsYaw.current, 0);
             sleep(1100);
-            armPosDegree(0, 0, -124, 550);
+            armPosDegree(0, 0, -236, 550);
             sleep(1000);
         }
-        else if (tsleft.isPressed() && !tsright.isPressed()) {
+        else if (!tsleft.isPressed() && tsright.isPressed()) {
             armPos(armPositionsPitch.middle, 2200, armPositionsYaw.current, 0);
             sleep(1100);
-            armPosDegree(0, 0, -112, 820);
+            armPosDegree(0, 0, -248, 820);
             sleep(1500);
         }
         else {
             armPos(armPositionsPitch.output, 2200, armPositionsYaw.current, 0);
             sleep(1100);
-            armPosDegree(0, 0, -112, 820);
+            armPosDegree(0, 0, -248, 820);
             sleep(1500);
         }
         cs1.setPower(-0.5);
@@ -202,29 +206,13 @@ public class DropOffBLUEleft extends LinearOpMode {
             runInches(30, direction.right, 920);
         }
         sleep(700);
-        armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree270, 1000);
+        armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree90, 1000);
         timerBreak.reset();
-        while (timerBreak.milliseconds() < 2200) {
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("RL", rl.getCurrentPosition());
-            telemetry.addData("RR", rr.getCurrentPosition());
-            telemetry.addData("AR", ar.getCurrentPosition());
-            telemetry.addData("AP", ap.getCurrentPosition());
-            telemetry.update();
-        }
-        runInches(17, direction.backward, 1000);
+        sleep(2200);
+        runInches(17, direction.forward, 1000);
         armPos(armPositionsPitch.intake, 2000, armPositionsYaw.current, 0);
         timerBreak.reset();
-        while (timerBreak.milliseconds() < 1500) {
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("RL", rl.getCurrentPosition());
-            telemetry.addData("RR", rr.getCurrentPosition());
-            telemetry.addData("AR", ar.getCurrentPosition());
-            telemetry.addData("AP", ap.getCurrentPosition());
-            telemetry.update();
-        }
+        sleep(1500);
         fl.setVelocity(0);
         fr.setVelocity(0);
         rl.setVelocity(0);
@@ -236,11 +224,11 @@ public class DropOffBLUEleft extends LinearOpMode {
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fl.setVelocity(-500);
-        fr.setVelocity(-500);
-        rl.setVelocity(-500);
-        rr.setVelocity(-500);
-        while (!ts1.isPressed() && fl.getCurrentPosition() > prevCurrent - (25 * tpi_d) && opModeIsActive()) {
+        fl.setVelocity(500);
+        fr.setVelocity(500);
+        rl.setVelocity(500);
+        rr.setVelocity(500);
+        while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (25 * tpi_d) && opModeIsActive()) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());
             telemetry.addData("RL", rl.getCurrentPosition());
@@ -256,40 +244,45 @@ public class DropOffBLUEleft extends LinearOpMode {
             rr.setVelocity(0);
             cs1.setPower(0);
             cs2.setPower(0);
-            armPos(armPositionsPitch.output, 2200, armPositionsYaw.degree180, 800);
+            armPos(armPositionsPitch.output, 2200, armPositionsYaw.degree225, 800);
             sleep(100);
-            runInches((int)Math.round((prevCurrent - fl.getCurrentPosition()) / tpi_d + 42), direction.forward, 1000);
+            final long round = Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 25);
+            runInches((int) round, direction.backward, 1000);
             timerBreak.reset();
-            while (timerBreak.milliseconds() < 3500) {
-                telemetry.addData("FL", fl.getCurrentPosition());
-                telemetry.addData("FR", fr.getCurrentPosition());
-                telemetry.addData("RL", rl.getCurrentPosition());
-                telemetry.addData("RR", rr.getCurrentPosition());
-                telemetry.addData("AR", ar.getCurrentPosition());
-                telemetry.addData("AP", ap.getCurrentPosition());
-                telemetry.update();
-            }
-            runInches(16, direction.left, 1000);
+            sleep(3500);
+            runInches(23, direction.left, 1000);
             timerBreak.reset();
-            while (timerBreak.milliseconds() < 1200) {
-                telemetry.addData("FL", fl.getCurrentPosition());
-                telemetry.addData("FR", fr.getCurrentPosition());
-                telemetry.addData("RL", rl.getCurrentPosition());
-                telemetry.addData("RR", rr.getCurrentPosition());
-                telemetry.addData("AR", ar.getCurrentPosition());
-                telemetry.addData("AP", ap.getCurrentPosition());
-                telemetry.update();
-            }
+            sleep(1200);
             cs1.setPower(-0.5);
             cs2.setPower(0.5);
             sleep(1000);
             cs1.setPower(0);
             cs2.setPower(0);
-            runInches(21, direction.right, 1200);
+            runInches(26, direction.right, 1200);
             sleep(500);
-            armPos(armPositionsPitch.up, 2200, armPositionsYaw.degree270, 1000);
+            armPos(armPositionsPitch.intake, 2200, armPositionsYaw.degree90, 1000);
             timerBreak.reset();
-            while (timerBreak.milliseconds() < 1000) {
+            sleep(1000);
+            runInches((int) round, direction.forward, 1200);
+            timerBreak.reset();
+            sleep(2500);
+            fl.setVelocity(0);
+            fr.setVelocity(0);
+            rl.setVelocity(0);
+            rr.setVelocity(0);
+            cs1.setPower(0.55);
+            cs2.setPower(-0.55);
+            prevCurrent = fl.getCurrentPosition();
+            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fl.setVelocity(500);
+            fr.setVelocity(500);
+            rl.setVelocity(500);
+            rr.setVelocity(500);
+
+            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (18 * tpi_d) && opModeIsActive()) {
                 telemetry.addData("FL", fl.getCurrentPosition());
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
@@ -298,24 +291,6 @@ public class DropOffBLUEleft extends LinearOpMode {
                 telemetry.addData("AP", ap.getCurrentPosition());
                 telemetry.update();
             }
-            runInches(54, direction.backward, 1200);
-            timerBreak.reset();
-            while (timerBreak.milliseconds() < 2500) {
-                telemetry.addData("FL", fl.getCurrentPosition());
-                telemetry.addData("FR", fr.getCurrentPosition());
-                telemetry.addData("RL", rl.getCurrentPosition());
-                telemetry.addData("RR", rr.getCurrentPosition());
-                telemetry.addData("AR", ar.getCurrentPosition());
-                telemetry.addData("AP", ap.getCurrentPosition());
-                telemetry.update();
-            }
-            runInches(23, direction.left, 1000);
-            sleep(1600);
-            fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            sleep(100);
         }
         else {
             fl.setVelocity(0);
@@ -328,6 +303,68 @@ public class DropOffBLUEleft extends LinearOpMode {
             cs1.setPower(0);
             cs2.setPower(0);
             armPos(armPositionsPitch.low, 2000, armPositionsYaw.current, 0);
+        }
+        if (ts1.isPressed()) {
+            fl.setVelocity(0);
+            fr.setVelocity(0);
+            rl.setVelocity(0);
+            rr.setVelocity(0);
+            cs1.setPower(0);
+            cs2.setPower(0);
+            armPos(armPositionsPitch.output, 2200, armPositionsYaw.degree225, 800);
+            final long round = Math.round(((fl.getCurrentPosition()) - prevCurrent) / tpi_d + 25);
+            runInches((int)round, direction.backward, 1000);
+            sleep(3500);
+            runInches(23, direction.left, 1000);
+            timerBreak.reset();
+            sleep(1200);
+            cs1.setPower(-0.5);
+            cs2.setPower(0.5);
+            sleep(1000);
+            cs1.setPower(0);
+            cs2.setPower(0);
+            runInches(26, direction.right, 1200);
+            sleep(500);
+            armPosDegree(1, 2200, -83, 800);
+            sleep(1000);
+            runInches((int) round, direction.forward, 1200);
+            sleep(2500);
+            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            cs1.setPower(0.55);
+            cs2.setPower(-0.55);
+            fl.setVelocity(500);
+            fr.setVelocity(500);
+            rl.setVelocity(500);
+            rr.setVelocity(500);
+            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (18 * tpi_d) && opModeIsActive()) {
+                telemetry.addData("FL", fl.getCurrentPosition());
+                telemetry.addData("FR", fr.getCurrentPosition());
+                telemetry.addData("RL", rl.getCurrentPosition());
+                telemetry.addData("RR", rr.getCurrentPosition());
+                telemetry.addData("AR", ar.getCurrentPosition());
+                telemetry.addData("AP", ap.getCurrentPosition());
+                telemetry.update();
+            }
+            cs1.setPower(0);
+            cs2.setPower(0);
+            fl.setVelocity(0);
+            fr.setVelocity(0);
+            rl.setVelocity(0);
+            rr.setVelocity(0);
+        }
+        else {
+            fl.setVelocity(0);
+            fr.setVelocity(0);
+            rl.setVelocity(0);
+            rr.setVelocity(0);
+            cs1.setPower(-0.1);
+            cs2.setPower(0.1);
+            sleep(4);
+            cs1.setPower(0);
+            cs2.setPower(0);
         }
         led.setPower(0);
         fl.setPower(0);
