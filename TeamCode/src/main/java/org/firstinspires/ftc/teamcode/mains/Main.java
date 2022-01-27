@@ -5,8 +5,6 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -18,27 +16,20 @@ import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
 
-// This annotates the class to tell the robot controller app that it is a TeleOp OpMode
-@TeleOp(name="OldMain",group="")
-@Disabled
+@TeleOp(name="Main",group="")
 public class Main extends LinearOpMode {
     // Pre-init
     private final Nikolaj robot = new Nikolaj(); // Library with robot config
     private final FieldCentric drive = new FieldCentric(); // Library with field centric drive functions
     private final FtcDashboard dashboard = FtcDashboard.getInstance(); // FtcDashboard instance
     private final TelemetryPacket packet = new TelemetryPacket(); // Telemetry packet to send to dashboard
-
-    // This function is ran when you press init
+    
     @Override
     public void runOpMode() {
         // Init
         robot.setup(hardwareMap); // Initializes the config
 
-        // Manual initialization of stuff because testing
-        final CRServo intake = robot.getLSrv();
-        final CRServo spinner = robot.getRSrv();
-
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu1");
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters params = new BNO055IMU.Parameters();
         params.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -49,16 +40,30 @@ public class Main extends LinearOpMode {
 
         // Set up field centric driving
         drive.setUp(
-            new DcMotor[]{robot.frMotor(), robot.rrMotor(), robot.rlMotor(), robot.flMotor()},
-            new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4},
-            imu,
-            hardwareMap
+                new DcMotor[]{robot.frMotor(), robot.rrMotor(), robot.rlMotor(), robot.flMotor()},
+                new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4},
+                imu,
+                hardwareMap
         );
 
-        // Lifter positions (min is actually how high it can go)
-        int lifterMin = -8000;
-        int lifterMax = 0;
-        double lifterSpeed;
+        // Drive powers
+        double lifterPower, lSrvPower, rSrvPower;
+        double lifterPrevP, lSrvPrevP, rSrvPrevP;
+        lifterPower = lSrvPower = rSrvPower = 0;
+        lifterPrevP = lSrvPrevP = rSrvPrevP = 0;
+
+        int armPos, armPrevP;
+        armPos = armPrevP = 0;
+        int midArmL = 106;
+        int midArmR = -68;
+        int sideArmL = 276;
+        int sideArmR = -257;
+        int armMax = 350;
+
+        // Lifter positions
+        int lifterMin =   376;
+        int lifterMid =   971;
+        int lifterMax = 11935;
         boolean lifterMoving = false;
 
         int intaking = 0;
@@ -68,7 +73,7 @@ public class Main extends LinearOpMode {
         double slowerSpeed = .5;
 
         // Toast notification because I can
-        AppUtil.getInstance().showToast(UILocation.BOTH, "Iteration 7.3-8.3");
+        AppUtil.getInstance().showToast(UILocation.BOTH, "Ver 2 Iteration 0.1-2.0");
         waitForStart(); // This function halts the program until you press start
 
         // Pre-run
@@ -77,82 +82,95 @@ public class Main extends LinearOpMode {
         Gamepad cp2 = new Gamepad();
         while (opModeIsActive()) {
             // TeleOp loop
-            drive.gyro(); // Update angles in the field centric program
-            // Make it drive
+            drive.gyro();
             drive.Drive(
                     !slower ? -gamepad1.left_stick_x : -gamepad1.left_stick_x * slowerSpeed,
                     !slower ? gamepad1.left_stick_y : gamepad1.left_stick_y * slowerSpeed,
-                    !slower ? -gamepad1.right_stick_x * .5 : -gamepad1.right_stick_x * slowerSpeed * .5
+                    !slower ? gamepad1.right_stick_x * 0.6 : gamepad1.right_stick_x * slowerSpeed * 0.6
             );
-            
-            if (gamepad1.back && !cp1.back) { drive.resetAngle(); } // Reset angle in field centric program
 
-            // Controls the lifter
-            lifterSpeed = gamepad2.left_stick_y;
-            int curPos = robot.getLifter().getCurrentPosition();
+            if (gamepad1.back) { drive.resetAngle(); }
+
+            lifterPower = -gamepad2.left_stick_y;
+            int lifterCur = robot.getLifter().getCurrentPosition();
             if (lifterMoving) {
-                if (lifterSpeed > 0.1 || lifterSpeed < -0.1) { lifterMoving = false; lifterSpeed = (0); }
-                if (curPos < -6653) { lifterSpeed = 1; }
-                else if (curPos < -6652) { lifterMoving = false; lifterSpeed = 0; }
-                else if (curPos > -6651) { lifterSpeed = (-1); }
-            } else if (curPos > lifterMax - 2) { // If the lifter is near the maximum, don't let it go down more (because that's how the lifter works)
-                lifterSpeed = clamp(-1, 0, lifterSpeed);
-            } else if (curPos < lifterMin + 2) { // If the lifter is near the minimum, don't left it go up
-                lifterSpeed = clamp(0, 1, lifterSpeed);
+                if (lifterPower > 0.1 || lifterPower < -0.1) { lifterMoving = false; }
+                if (lifterCur > 6653) { lifterPower = -1; }
+                else if (lifterCur > 6652) { lifterMoving = false; lifterPower = 0; }
+                else if (lifterCur < 6651) { lifterPower = 1; }
+            } else if (lifterCur > lifterMax - 2) {
+                lifterPower = clamp(-1, 0, lifterPower);
+            } else if (lifterCur < lifterMin + 2) {
+                lifterPower = clamp(0, 1, lifterPower);
+            } else if (lifterCur < lifterMid + 3 && lifterCur > lifterMid - 2 &&
+                        ((armPos < sideArmL && armPos > midArmL) ||
+                                (armPos < midArmR && armPos > sideArmR))) {
+                lifterPower = clamp(0, 1, lifterPower);
+            }
+
+            if (intaking == 0 && gamepad2.a && !cp2.a) {
+                lSrvPower = spinSpeed;
+                rSrvPower = -spinSpeed;
+                intaking = 1;
+            } else if (intaking != 0 && ((gamepad2.a && !cp2.a) || (gamepad2.b && !cp2.b))) {
+                lSrvPower = 0;
+                rSrvPower = 0;
+                intaking = 0;
+            } else if (intaking == 0 && gamepad2.b && !cp2.b) {
+                lSrvPower = -spinSpeed + .1;
+                rSrvPower = spinSpeed - .1;
+                intaking = -1;
+            }
+
+            if (intaking == 1 && robot.getTouch().isPressed()) {
+                lSrvPower = 0;
+                rSrvPower = 0;
+                intaking = 0;
+            }
+
+            if (gamepad2.right_bumper && !gamepad2.left_bumper) {
+                lSrvPower = 1;
+                rSrvPower = 0;
+                intaking = 0;
+            } else if (gamepad2.left_bumper && !gamepad2.right_bumper) {
+                lSrvPower = 0;
+                rSrvPower = -1;
+                intaking = 0;
+            } else if (intaking == 0) {
+                lSrvPower = 0;
+                rSrvPower = 0;
+            }
+
+            armPos += -Math.round(gamepad2.right_stick_x) * 3;
+//            int armCur = robot.getArm().getCurrentPosition();
+
+            if (lifterCur <= lifterMid + 2) {
+//                if (armCur < midArmL && armCur > midArmR) {
+//                    armPos = (int) clamp(midArmR, midArmL, armPos);
+//                } else if (armCur > midArmL + 10) {
+//                    armPos = (int) clamp(sideArmL, armMax, armPos);
+//                } else if (armCur < midArmR - 10) {
+//                    armPos = (int) clamp(-armMax, sideArmR, armPos);
+//                }
+            } else {
+                armPos = (int) clamp(-350, 350, armPos);
             }
 
             if (gamepad2.y && !cp2.y) {
                 lifterMoving = !lifterMoving;
             }
-            robot.getLifter().setPower(lifterSpeed); // Actually set the speed
-            telemetry.addData("Lifter", curPos); // -6652
 
-            // Intake control
-            if (intaking == 0 && gamepad2.a && !cp2.a) {
-                intake.setPower(spinSpeed);
-                spinner.setPower(-spinSpeed);
-                intaking = 1;
-            } else if (intaking != 0 && ((gamepad2.a && !cp2.a) || (gamepad2.b && !cp2.b))) {
-                intake.setPower(0);
-                spinner.setPower(0);
-                intaking = 0;
-            } else if (intaking == 0 && gamepad2.b && !cp2.b) {
-                intake.setPower(-spinSpeed + .1);
-                spinner.setPower(spinSpeed - .1);
-                intaking = -1;
-            }
-
-            // Stop intaking if we are intaking and the touch sensor is pressed
-            if (intaking == 1 && robot.getTouch().isPressed()) {
-                robot.getLSrv().setPower(0);
-                robot.getRSrv().setPower(0);
-                intaking = 0;
-            }
-
-            // Runs the servo to spin the duck thing
-            if (gamepad2.right_bumper && !gamepad2.left_bumper) {
-                spinner.setPower(1);
-                intake.setPower(0);
-                intaking = 0;
-            } else if (gamepad2.left_bumper && !gamepad2.right_bumper) {
-                intake.setPower(-1);
-                spinner.setPower(0);
-                intaking = 0;
-            } else if (intaking == 0) {
-                spinner.setPower(0);
-                intake.setPower(0);
-            }
-
-            if (gamepad1.x && !cp1.x) {
-                slower = !slower;
-            }
-            telemetry.addData("Slower", slower);
-
+            telemetry.addData("Current Arm Position", armPos);
             telemetry.update();
 
+            if (gamepad1.x && !cp1.x) { slower = !slower; }
+
+            if (lifterPower != lifterPrevP) { robot.getLifter().setPower(lifterPower); lifterPrevP = lifterPower; }
+            if (armPos != armPrevP) { robot.getArm().setTargetPosition(armPos); armPrevP = armPos; }
+            if (lSrvPower != lSrvPrevP) { robot.getLSrv().setPower(lSrvPower); lSrvPrevP = lSrvPower; }
+            if (rSrvPower != rSrvPrevP) { robot.getRSrv().setPower(rSrvPower); rSrvPrevP = rSrvPower; }
+
             try {
-                // Copy the gamepad state at the end of the cycle for use in the next cycle
-                // This allows us to know what buttons have (not) changed
                 cp1.copy(gamepad1);
                 cp2.copy(gamepad2);
             } catch (Exception ignored) {}

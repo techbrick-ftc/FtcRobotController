@@ -142,7 +142,7 @@ public class CameraMain {
         if (abs(deltaX) < 5 && abs(deltaY) < 5) {
             localSpeed *= avg(abs(deltaX), abs(deltaY)) / 12;
         }
-        localSpeed = clamp(0.2, 1, localSpeed);
+        localSpeed = clamp(0.3, 1, localSpeed);
 
         for (int i = 0; i < this.motors.length; i++) {
             double motorSpeed = (Math.sin(this.angles[i] - driveTheta) + clamp(-1, 1, deltaTheta)) * localSpeed;
@@ -180,7 +180,7 @@ public class CameraMain {
         writeTelemetry(deltaX, deltaY, driveTheta);
 
         dashboard.sendTelemetryPacket(packet);
-        telemetry.update();
+        //telemetry.update();
 
         return false;
     }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.libs;
 
+import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -22,6 +23,7 @@ public class Globals {
     private static T265Camera camera;
     private static BNO055IMU imu;
     private static Transform2d transform = new Transform2d();
+    private static boolean initialPoseSet = false;
 
     public static void setCameraStart(Transform2d transform2d) {
         if (camera == null) {
@@ -39,6 +41,13 @@ public class Globals {
         }
     }
 
+    public static void setPose(Pose2d pose) {
+        if (!initialPoseSet) {
+            camera.setPose(pose);
+            initialPoseSet = true;
+        }
+    }
+
     public static void setupIMU(HardwareMap hardwareMap) {
         if (imu == null) {
             imu = hardwareMap.get(BNO055IMU.class, "imu1");
@@ -51,6 +60,6 @@ public class Globals {
     public static BNO055IMU getImu() { return imu; }
     public static T265Camera getCamera() { return camera; }
 
-    public static void startCamera() { camera.start(); }
+    public static void startCamera() { if (!camera.isStarted()) camera.start(); }
     public static void stopCamera() { camera.stop(); }
 }
