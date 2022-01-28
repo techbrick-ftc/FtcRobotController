@@ -24,6 +24,7 @@ public class DarkMatter extends LinearOpMode {
     DcMotorEx rl;
     DcMotorEx rr;
     DcMotorEx ar;
+    DcMotorEx duck;
     DcMotorEx ap;
     CRServo cs1;
     CRServo cs2;
@@ -37,6 +38,9 @@ public class DarkMatter extends LinearOpMode {
     boolean pressed = false;
     boolean fieldCentric = true;
     boolean driveAllowed;
+    boolean quacking = false;
+    int quackingOn = 0;
+    ElapsedTime quacker = new ElapsedTime();
     double y2;
     double x2;
     Gamepad cp1;
@@ -161,19 +165,8 @@ public class DarkMatter extends LinearOpMode {
     //Input Output Servos Control
     //
     public void inputOutputControl() {
-        //Duck Spin
-        if (gamepad2.right_stick_x > 0.05) {
-            runningInput = false;
-            cs1.setPower(1);
-            cs2.setPower(1);
-        }
-        else if (gamepad2.right_stick_x < -0.05) {
-            runningInput = false;
-            cs1.setPower(-1);
-            cs2.setPower(-1);
-        }
         //Runs servos to output item
-        else if (gamepad2.right_trigger > 0.05) {
+        if (gamepad2.right_trigger > 0.05) {
             cs1.setPower(-0.35);
             cs2.setPower(0.35);
             runningInput = false;
@@ -198,6 +191,25 @@ public class DarkMatter extends LinearOpMode {
         }
 
     }
+    public void quack(int quackerMode) {
+        //Duck Spin
+        if (!quacking) {
+            quacker.reset();
+            quackingOn = quackerMode;
+            quacking = true;
+            duck.setPower(0.5 * quackerMode);
+        }
+        if (quacker.seconds() > 0.2 && quacker.seconds() < 1.3) {
+            duck.setPower(0.72 * quackerMode);
+        }
+        else if (quacker.seconds() > 1.3 && quacker.seconds() < 1.8) {
+            duck.setPower(quackerMode);
+        }
+        else if (quacker.seconds() > 1.8) {
+            quacking = false;
+            duck.setPower(0);
+        }
+    }
     @Override
     //OpMode
     public void runOpMode() {
@@ -208,6 +220,7 @@ public class DarkMatter extends LinearOpMode {
         rr = hardwareMap.get(DcMotorEx.class, "rr");
         ar = hardwareMap.get(DcMotorEx.class, "ar");
         ap = hardwareMap.get(DcMotorEx.class, "ap");
+        duck = hardwareMap.get(DcMotorEx.class, "quack");
         cs1 = hardwareMap.get(CRServo.class, "cs1");
         cs2 = hardwareMap.get(CRServo.class, "cs2");
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
@@ -225,6 +238,7 @@ public class DarkMatter extends LinearOpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        duck.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //Waits for start of OpMode
         waitForStart();
         cp1 = new Gamepad();
@@ -250,6 +264,16 @@ public class DarkMatter extends LinearOpMode {
                 else {
                     robotCentricDrive(x2, y2, rx);
                 }
+            }
+            //Duck spin
+            if (gamepad1.b || gamepad1.x || quacking) {
+                if (quacking) {
+                    quack(quackingOn);
+                }
+                else {
+                    quack(gamepad1.x ? 1 : -1);
+                }
+
             }
             //Calibrate pitch
             if (gamepad2.back) {
