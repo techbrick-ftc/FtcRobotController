@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mains;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -7,7 +8,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -39,12 +39,15 @@ public class Main extends LinearOpMode {
         imu.initialize(params);
 
         // Set up field centric driving
-        drive.setUp(
-                new DcMotor[]{robot.frMotor(), robot.rrMotor(), robot.rlMotor(), robot.flMotor()},
-                new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4},
-                imu,
-                hardwareMap
-        );
+        DcMotor[] motors = new DcMotor[]{robot.frMotor(), robot.rrMotor(), robot.rlMotor(), robot.flMotor()};
+        double[] angles = new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4};
+
+        drive.setUp(motors, angles, imu, hardwareMap);
+
+        // Motor modes
+        for (DcMotor motor : motors) {
+            motor.setZeroPowerBehavior(BRAKE);
+        }
 
         // Drive powers
         double lifterPower, lSrvPower, rSrvPower;
@@ -63,6 +66,7 @@ public class Main extends LinearOpMode {
         // Lifter positions
         int lifterMin =   376;
         int lifterMid =   971;
+        int lifterDuck = 3000;
         int lifterMax = 11935;
         boolean lifterMoving = false;
 
@@ -95,9 +99,9 @@ public class Main extends LinearOpMode {
             int lifterCur = robot.getLifter().getCurrentPosition();
             if (lifterMoving) {
                 if (lifterPower > 0.1 || lifterPower < -0.1) { lifterMoving = false; }
-                if (lifterCur > 6653) { lifterPower = -1; }
-                else if (lifterCur > 6652) { lifterMoving = false; lifterPower = 0; }
-                else if (lifterCur < 6651) { lifterPower = 1; }
+                if (lifterCur > lifterDuck + 1) { lifterPower = -1; }
+                else if (lifterCur > lifterDuck) { lifterMoving = false; lifterPower = 0; }
+                else if (lifterCur < lifterDuck - 1) { lifterPower = 1; }
             } else if (lifterCur > lifterMax - 2) {
                 lifterPower = clamp(-1, 0, lifterPower);
             } else if (lifterCur < lifterMin + 2) {
@@ -141,7 +145,6 @@ public class Main extends LinearOpMode {
                 rSrvPower = 0;
             }
 
-            armPos += -Math.round(gamepad2.right_stick_x) * 3;
 //            int armCur = robot.getArm().getCurrentPosition();
 
             if (lifterCur <= lifterMid + 2) {
@@ -153,6 +156,7 @@ public class Main extends LinearOpMode {
 //                    armPos = (int) clamp(-armMax, sideArmR, armPos);
 //                }
             } else {
+                armPos += -Math.round(gamepad2.right_stick_x) * 3;
                 armPos = (int) clamp(-350, 350, armPos);
             }
 
