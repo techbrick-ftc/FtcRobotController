@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.mains;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static java.lang.Math.PI;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,13 +14,13 @@ import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
 
-@TeleOp(name="Main",group="")
+@TeleOp(name="Main")
 public class Main extends LinearOpMode {
     // Pre-init
     private final Nikolaj robot = new Nikolaj(); // Library with robot config
     private final FieldCentric drive = new FieldCentric(); // Library with field centric drive functions
-    private final FtcDashboard dashboard = FtcDashboard.getInstance(); // FtcDashboard instance
-    private final TelemetryPacket packet = new TelemetryPacket(); // Telemetry packet to send to dashboard
+//    private final FtcDashboard dashboard = FtcDashboard.getInstance(); // FtcDashboard instance
+//    private final TelemetryPacket packet = new TelemetryPacket(); // Telemetry packet to send to dashboard
     
     @Override
     public void runOpMode() {
@@ -66,7 +64,7 @@ public class Main extends LinearOpMode {
         // Lifter positions
         int lifterMin =   376;
         int lifterMid =   971;
-        int lifterDuck = 3000;
+        int lifterDuck = 6943;
         int lifterMax = 11935;
         boolean lifterMoving = false;
 
