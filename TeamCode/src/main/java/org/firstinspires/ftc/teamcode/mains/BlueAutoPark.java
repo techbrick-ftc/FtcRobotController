@@ -19,8 +19,8 @@ public class BlueAutoPark extends LinearOpMode implements TeleAuto {
         // Init
         robot.setup(hardwareMap);
 
-        robot.flMotor().setDirection(DcMotor.Direction.REVERSE);
         robot.rlMotor().setDirection(DcMotor.Direction.REVERSE);
+        robot.rrMotor().setDirection(DcMotor.Direction.REVERSE);
 
         robot.flMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.frMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -30,7 +30,7 @@ public class BlueAutoPark extends LinearOpMode implements TeleAuto {
         waitForStart();
 
         if (opModeIsActive()) {
-            robot.getLifter().setPower(-1);
+            robot.getLifter().setPower(1);
             sleep(1000);
             robot.getLifter().setPower(0);
 
@@ -40,7 +40,7 @@ public class BlueAutoPark extends LinearOpMode implements TeleAuto {
             strafe(-0.5, 1500);
             sleep(500);
 
-            robot.getLifter().setPower(1);
+            robot.getLifter().setPower(-1);
             sleep(1000);
             robot.getLifter().setPower(0);
         }
