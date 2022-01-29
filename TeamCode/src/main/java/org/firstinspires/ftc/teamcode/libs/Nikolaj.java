@@ -46,8 +46,8 @@ public class Nikolaj {
         lSrv = hardwareMap.get(CRServo.class, "servo1");
         rSrv = hardwareMap.get(CRServo.class, "servo0");
 
-        frMotor.setDirection(REVERSE);
-        rlMotor.setDirection(REVERSE);
+        flMotor.setDirection(REVERSE);
+        rrMotor.setDirection(REVERSE);
 
         touch = hardwareMap.get(TouchSensor.class, "touch");
     }

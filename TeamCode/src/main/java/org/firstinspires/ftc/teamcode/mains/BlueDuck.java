@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.libs.CameraAuto;
 import org.firstinspires.ftc.teamcode.libs.EasyOpenCVImportable;
@@ -40,26 +42,32 @@ public class BlueDuck extends LinearOpMode implements TeleAuto {
         // Init
         robot.setup(hardwareMap);
 
-        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, 250, 25, 250, 105, 20, 20);
+        camera.init(EasyOpenCVImportable.CameraType.WEBCAM, hardwareMap, 250, 40, 250, 120, 20, 20);
 
         camera.startDetection();
         dashboard.startCameraStream(camera.getWebCamera(), 0);
 
+        Globals.setCameraStart(new Transform2d(new Translation2d(0., 0.), new Rotation2d(PI/2)));
+
         Globals.setupCamera(hardwareMap);
+        Globals.setupIMU(hardwareMap);
 
         auto.setUp(
-                new DcMotor[]{robot.flMotor(), robot.frMotor(), robot.rrMotor(), robot.rlMotor()},
+                new DcMotor[]{robot.frMotor(), robot.rrMotor(), robot.rlMotor(), robot.flMotor()},
                 new double[]{PI/4, 3*PI/4, 5*PI/4, 7*PI/4},
                 null, AxesReference.EXTRINSIC, hardwareMap);
 
         ElapsedTime et = new ElapsedTime();
         while (!opModeIsActive() && !isStopRequested()) {
+            int[] analysis = camera.getAnalysis();
             telemetry.addData("Time in init", et.milliseconds() / 1000);
-            telemetry.addData("Camera normalized", et.seconds() > 4);
+            telemetry.addData("Camera normalized", (analysis[0] < 130 && analysis[1] < 130));
             telemetry.update();
 
             initPacket.put("Time in init", et.milliseconds() / 1000);
-            initPacket.put("Camera normalized", et.seconds() > 4);
+            initPacket.put("Camera normalized", (analysis[0] < 130 && analysis[1] < 130));
+            initPacket.put("avg1", camera.getAnalysis()[0]);
+            initPacket.put("avg2", camera.getAnalysis()[1]);
             dashboard.sendTelemetryPacket(initPacket);
         }
 
@@ -70,6 +78,8 @@ public class BlueDuck extends LinearOpMode implements TeleAuto {
         if (opModeIsActive()) {
             // TeleOp loop
             while (camera.getDetection() == -1 && opModeIsActive()) { idle(); }
+            int detection = camera.getDetection();
+            camera.stopDetection();
 
             while (opModeIsActive() && !gamepad1.a) {
                 final int robotRadius = 9; // inches
@@ -92,21 +102,63 @@ public class BlueDuck extends LinearOpMode implements TeleAuto {
                 packet.put("X", translation.getX());
                 packet.put("Y", translation.getY());
                 packet.put("Angle", rotation.getRadians());
+                packet.put("IMU Int", Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
+                packet.put("IMU Ext", Globals.getImu().getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
 
                 telemetry.addData("X", translation.getX());
                 telemetry.addData("Y", translation.getY());
                 telemetry.addData("Angle", rotation.getRadians());
+                telemetry.addData("IMU Int", Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
+                telemetry.addData("IMU Ext", Globals.getImu().getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
                 telemetry.update();
 
-                packet.put("Final pos", camera.getDetection());
+                packet.put("Final pos", detection);
                 dashboard.sendTelemetryPacket(packet);
             }
 
             sleep(3000);
 
-            auto.goToPosition(0, 21, this);
-            auto.goToPosition(4, 21, this);
-            auto.goTo(15, 21, PI/2, 0.5, this);
+            auto.goToPosition(0, -10, 0.4, this);
+            sleep(1000);
+
+            auto.goToPosition(19, -10, 0.4, this);
+            sleep(1000);
+
+//            auto.goTo(24, -14, PI/2, 0.5, this);
+            auto.goToRotation(-PI/2, 0.4, this);
+            sleep(1000);
+
+            if (detection == 2) {
+                robot.getLifter().setPower(0.4);
+                while (robot.getLifter().getCurrentPosition() < 2634 && opModeIsActive()) idle();
+                robot.getLifter().setPower(0);
+
+                robot.getLSrv().setPower(-1);
+                robot.getRSrv().setPower(1);
+                sleep(1000);
+                robot.getLSrv().setPower(0);
+                robot.getRSrv().setPower(0);
+            } else if (detection == 1) {
+                robot.getLifter().setPower(0.4);
+                while (robot.getLifter().getCurrentPosition() < 5960 && opModeIsActive()) idle();
+                robot.getLifter().setPower(0);
+
+                robot.getLSrv().setPower(-1);
+                robot.getRSrv().setPower(1);
+                sleep(1000);
+                robot.getLSrv().setPower(0);
+                robot.getRSrv().setPower(0);
+            } else {
+                robot.getLifter().setPower(0.4);
+                while (robot.getLifter().getCurrentPosition() < 9895 && opModeIsActive()) idle();
+                robot.getLifter().setPower(0);
+
+                robot.getLSrv().setPower(-1);
+                robot.getRSrv().setPower(1);
+                sleep(1000);
+                robot.getLSrv().setPower(0);
+                robot.getRSrv().setPower(0);
+            }
         }
         camera.stopDetection();
         Globals.stopCamera();

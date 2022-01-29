@@ -30,12 +30,11 @@ public class CameraMain {
     private double[] angles;
     private double[] motorSpeeds;
     private BNO055IMU imu;
+    private float zero;
     private HashMap<String, String> orientationModifier;
     private T265Camera camera;
     private AxesReference axesReference;
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
-    private final TelemetryPacket packet = new TelemetryPacket();
-    private final Canvas field = packet.fieldOverlay();
 
     private Telemetry telemetry;
 
@@ -53,6 +52,7 @@ public class CameraMain {
         this.angles = angles;
         setupIMU(hardwareMap);
         this.imu = getImu();
+        this.zero = gangles().firstAngle;
         this.orientationModifier = orientationModifiers;
         setupCamera(hardwareMap);
         this.camera = getCamera();
@@ -62,44 +62,45 @@ public class CameraMain {
 
     private Orientation gangles() {
         Orientation orientation = imu.getAngularOrientation(axesReference, AxesOrder.ZYX, AngleUnit.RADIANS);
-        if (orientationModifier != null) {
-            for (String k : this.orientationModifier.keySet()) {
-                String v = this.orientationModifier.get(k);
-                if (v == null) throw new IllegalArgumentException("Value cannot be null.");
-                char axis = k.charAt(0);
-                char action = k.charAt(2);
-                switch (axis) {
-                    case '1':
-                        switch (action) {
-                            case '+': orientation.firstAngle += Double.parseDouble(v); break;
-                            case '-': orientation.firstAngle -= Double.parseDouble(v); break;
-                            case '*': orientation.firstAngle *= Double.parseDouble(v); break;
-                            case '/': orientation.firstAngle /= Double.parseDouble(v); break;
-                            default: throw new IllegalArgumentException("Unknown operator " + action);
-                        }
-                        break;
-                    case '2':
-                        switch (action) {
-                            case '+': orientation.secondAngle += Double.parseDouble(v); break;
-                            case '-': orientation.secondAngle -= Double.parseDouble(v); break;
-                            case '*': orientation.secondAngle *= Double.parseDouble(v); break;
-                            case '/': orientation.secondAngle /= Double.parseDouble(v); break;
-                            default: throw new IllegalArgumentException("Unknown operator " + action);
-                        }
-                        break;
-                    case '3':
-                        switch (action) {
-                            case '+': orientation.thirdAngle += Double.parseDouble(v); break;
-                            case '-': orientation.thirdAngle -= Double.parseDouble(v); break;
-                            case '*': orientation.thirdAngle *= Double.parseDouble(v); break;
-                            case '/': orientation.thirdAngle /= Double.parseDouble(v); break;
-                            default: throw new IllegalArgumentException("Unknown operator " + action);
-                        }
-                        break;
-                    default: throw new IllegalArgumentException("Unknown axis " + axis);
-                }
-            }
-        }
+//        if (orientationModifier != null) {
+//            for (String k : this.orientationModifier.keySet()) {
+//                String v = this.orientationModifier.get(k);
+//                if (v == null) throw new IllegalArgumentException("Value cannot be null.");
+//                char axis = k.charAt(0);
+//                char action = k.charAt(2);
+//                switch (axis) {
+//                    case '1':
+//                        switch (action) {
+//                            case '+': orientation.firstAngle += Double.parseDouble(v); break;
+//                            case '-': orientation.firstAngle -= Double.parseDouble(v); break;
+//                            case '*': orientation.firstAngle *= Double.parseDouble(v); break;
+//                            case '/': orientation.firstAngle /= Double.parseDouble(v); break;
+//                            default: throw new IllegalArgumentException("Unknown operator " + action);
+//                        }
+//                        break;
+//                    case '2':
+//                        switch (action) {
+//                            case '+': orientation.secondAngle += Double.parseDouble(v); break;
+//                            case '-': orientation.secondAngle -= Double.parseDouble(v); break;
+//                            case '*': orientation.secondAngle *= Double.parseDouble(v); break;
+//                            case '/': orientation.secondAngle /= Double.parseDouble(v); break;
+//                            default: throw new IllegalArgumentException("Unknown operator " + action);
+//                        }
+//                        break;
+//                    case '3':
+//                        switch (action) {
+//                            case '+': orientation.thirdAngle += Double.parseDouble(v); break;
+//                            case '-': orientation.thirdAngle -= Double.parseDouble(v); break;
+//                            case '*': orientation.thirdAngle *= Double.parseDouble(v); break;
+//                            case '/': orientation.thirdAngle /= Double.parseDouble(v); break;
+//                            default: throw new IllegalArgumentException("Unknown operator " + action);
+//                        }
+//                        break;
+//                    default: throw new IllegalArgumentException("Unknown axis " + axis);
+//                }
+//            }
+//        }
+//        orientation.firstAngle -= zero;
         return orientation;
     }
 
@@ -117,7 +118,7 @@ public class CameraMain {
 
         double currentX = translation2d.getX() / 0.0254;
         double currentY = translation2d.getY() / 0.0254;
-        double currentTheta = gangles().firstAngle;
+        double currentTheta = getAngle();
 
         double deltaX = moveX - currentX;
         double deltaY = moveY - currentY;
@@ -133,7 +134,7 @@ public class CameraMain {
         }
 
         double driveTheta = Math.atan2(yComplete ? 0 : -deltaY, xComplete ? 0 : deltaX);
-        driveTheta += gangles().firstAngle;
+        driveTheta += getAngle();
 
         double localSpeed = speed;
         if (abs(deltaX) < 2 && abs(deltaY) < 2) {
@@ -163,6 +164,9 @@ public class CameraMain {
             this.motors[i].setPower(scale ? this.motorSpeeds[i] * scaleFactor : this.motorSpeeds[i]);
         }
 
+        final TelemetryPacket packet = new TelemetryPacket();
+        final Canvas field = packet.fieldOverlay();
+
 
         final int robotRadius = 9;
         Rotation2d rotation = up.pose.getRotation();
@@ -175,7 +179,29 @@ public class CameraMain {
 
         packet.put("X", currentX);
         packet.put("Y", currentY);
+        packet.put("Angle", getAngle());
         packet.put("Confidence", up.confidence);
+        packet.put("FR Speed", motors[0].getPower());
+        packet.put("RR Speed", motors[1].getPower());
+        packet.put("RL Speed", motors[2].getPower());
+        packet.put("FL Speed", motors[3].getPower());
+        packet.put("Delta X", deltaX);
+        packet.put("Delta Y", deltaY);
+        packet.put("Drive Theta", driveTheta);
+
+
+        System.out.println("X: " + currentX);
+        System.out.println("Y: " + currentY);
+        System.out.println("Angle: " + getAngle());
+        System.out.println("Confidence: " + up.confidence);
+        System.out.println("FR Speed: " + motors[0].getPower());
+        System.out.println("RR Speed: " + motors[1].getPower());
+        System.out.println("RL Speed: " + motors[2].getPower());
+        System.out.println("FL Speed: " + motors[3].getPower());
+        System.out.println("Delta X: " + deltaX);
+        System.out.println("Delta Y: " + deltaY);
+        System.out.println("Drive Theta: " + driveTheta);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
         writeTelemetry(deltaX, deltaY, driveTheta);
 
@@ -185,9 +211,9 @@ public class CameraMain {
         return false;
     }
 
-    public Orientation getRotation() {
-        return gangles();
-    }
+//    public Orientation getRotation() {
+//        return gangles();
+//    }
 
     public Translation2d getPosition() {
         Translation2d current = this.camera.getLastReceivedCameraUpdate().pose.getTranslation();
@@ -226,12 +252,5 @@ public class CameraMain {
     }
 
     private void writeTelemetry(double deltaX, double deltaY, double driveTheta) {
-        packet.put("FR Speed", motors[0].getPower());
-        packet.put("RR Speed", motors[1].getPower());
-        packet.put("RL Speed", motors[2].getPower());
-        packet.put("FL Speed", motors[3].getPower());
-        packet.put("Delta X", deltaX);
-        packet.put("Delta Y", deltaY);
-        packet.put("Drive Theta", driveTheta);
     }
 }

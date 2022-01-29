@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.libs;
 
+import static org.firstinspires.ftc.teamcode.libs.Globals.getAngle;
+
 import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -46,7 +48,7 @@ public class CameraTele {
     public void setPosition(double x, double y, double speed) {
         this.x = x;
         this.y = y;
-        this.theta = this.MAIN.getRotation().firstAngle;
+        this.theta = getAngle();
         this.speed = speed;
     }
 

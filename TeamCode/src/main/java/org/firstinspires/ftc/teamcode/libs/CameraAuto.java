@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -71,7 +73,7 @@ public class CameraAuto {
      *                 methods
      */
     public void goToPosition(double moveX, double moveY, double speed, @NotNull TeleAuto callback) {
-        double angle = this.MAIN.getRotation().firstAngle;
+        double angle = Globals.getAngle();
 
         goTo(moveX, moveY, angle, speed, callback);
     }

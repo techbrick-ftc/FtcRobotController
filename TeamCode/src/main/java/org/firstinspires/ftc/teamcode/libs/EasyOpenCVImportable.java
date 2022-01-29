@@ -5,7 +5,6 @@ package org.firstinspires.ftc.teamcode.libs;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.tests.RobotConfig;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -156,7 +155,7 @@ public class EasyOpenCVImportable {
          */
         void inputToCb(Mat input) {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(YCrCb, Cb, 0);
+            Core.extractChannel(YCrCb, Cb, 1);
         }
 
         @Override
@@ -173,11 +172,11 @@ public class EasyOpenCVImportable {
             sum1 = (int) Core.mean(region1_Cb).val[0];
             sum2 = (int) Core.mean(region2_Cb).val[0];
 
-            if (sum1 < 110) {
+            if (sum1 < 100) {
                 this.position = 0;
-            } else if (sum2 < 110) {
+            } else if (sum2 < 100) {
                 this.position = 1;
-            } else if (sum1 > 78 && sum2 > 78) {
+            } else if (sum1 > 110 && sum2 > 110) {
                 this.position = 2;
             }
 

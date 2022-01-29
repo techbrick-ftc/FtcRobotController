@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.libs.EasyOpenCVImportable;
-import org.firstinspires.ftc.teamcode.libs.TestBot;
+import org.firstinspires.ftc.teamcode.libs.RobotConfig;
 
 @Autonomous(name="Webcam Test",group="")
 public class WebcamTest extends LinearOpMode {

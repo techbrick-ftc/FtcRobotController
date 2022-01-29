@@ -2,17 +2,21 @@ package org.firstinspires.ftc.teamcode.mains;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.teamcode.libs.FieldCentric;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
+
+import java.util.HashMap;
 
 @TeleOp(name="Main")
 public class Main extends LinearOpMode {
@@ -42,6 +46,7 @@ public class Main extends LinearOpMode {
 
         drive.setUp(motors, angles, imu, hardwareMap);
 
+
         // Motor modes
         for (DcMotor motor : motors) {
             motor.setZeroPowerBehavior(BRAKE);
@@ -70,6 +75,7 @@ public class Main extends LinearOpMode {
 
         int intaking = 0;
         double spinSpeed = .7;
+        ElapsedTime rampTime = new ElapsedTime();
 
         boolean slower = false;
         double slowerSpeed = .5;
@@ -95,11 +101,13 @@ public class Main extends LinearOpMode {
 
             lifterPower = -gamepad2.left_stick_y;
             int lifterCur = robot.getLifter().getCurrentPosition();
+            int lifterDel = lifterDuck - lifterCur;
             if (lifterMoving) {
-                if (lifterPower > 0.1 || lifterPower < -0.1) { lifterMoving = false; }
-                if (lifterCur > lifterDuck + 1) { lifterPower = -1; }
-                else if (lifterCur > lifterDuck) { lifterMoving = false; lifterPower = 0; }
-                else if (lifterCur < lifterDuck - 1) { lifterPower = 1; }
+                if (abs(lifterPower) > 0.1) { lifterMoving = false; }
+                if (lifterCur > lifterDuck + 2 || lifterCur < lifterDuck - 2) {
+                    lifterPower = Math.tanh(lifterDel/200.);
+                }
+                else if (lifterCur > lifterDuck - 1 && lifterCur < lifterDuck + 1) { lifterMoving = false; lifterPower = 0; }
             } else if (lifterCur > lifterMax - 2) {
                 lifterPower = clamp(-1, 0, lifterPower);
             } else if (lifterCur < lifterMin + 2) {
@@ -131,12 +139,16 @@ public class Main extends LinearOpMode {
             }
 
             if (gamepad2.right_bumper && !gamepad2.left_bumper) {
-                lSrvPower = 1;
+                if (!cp2.right_bumper)
+                    rampTime.reset();
+                lSrvPower = Math.tanh(2*rampTime.seconds());
                 rSrvPower = 0;
                 intaking = 0;
             } else if (gamepad2.left_bumper && !gamepad2.right_bumper) {
+                if (!cp2.left_bumper)
+                    rampTime.reset();
                 lSrvPower = 0;
-                rSrvPower = -1;
+                rSrvPower = -Math.tanh(2*rampTime.seconds());
                 intaking = 0;
             } else if (intaking == 0) {
                 lSrvPower = 0;

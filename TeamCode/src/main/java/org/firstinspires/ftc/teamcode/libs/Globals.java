@@ -7,6 +7,10 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.spartronics4915.lib.T265Camera;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 /*
  * This file is made to be used in the CameraMain class so that the T265 camera and the internal
  * imu do not get instantiated more than once, because keeping them static means
@@ -59,6 +63,8 @@ public class Globals {
 
     public static BNO055IMU getImu() { return imu; }
     public static T265Camera getCamera() { return camera; }
+
+    public static float getAngle() { return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle; }
 
     public static void startCamera() { if (!camera.isStarted()) camera.start(); }
     public static void stopCamera() { camera.stop(); }
