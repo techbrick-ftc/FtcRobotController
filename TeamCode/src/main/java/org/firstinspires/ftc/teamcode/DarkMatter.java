@@ -96,7 +96,7 @@ public class DarkMatter extends LinearOpMode {
         else if (gamepad2.dpad_left && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             ar.setVelocity(-200);
         }
-        else {
+        else if (!ar.isBusy()) {
             ar.setVelocity(0);
         }
     }
@@ -136,14 +136,20 @@ public class DarkMatter extends LinearOpMode {
         //Level 3 shipping hub position
         else if (gamepad2.y) {
             ap.setTargetPosition(-3350);
+            ar.setTargetPosition(-1425);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ar.setVelocity(1300);
             ap.setVelocity(2500);
         }
-        //Duck position
+        //TSE Pickup
         else if (gamepad2.guide) {
-            ap.setTargetPosition(-2022);
+            ap.setTargetPosition(-375);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
+            runningInput = true;
+            cs1.setPower(0.55);
+            cs2.setPower(-0.55);
         }
         //Shared shipping hub position
         else if (gamepad2.b && !gamepad2.start && !gamepad1.start) {
@@ -154,11 +160,17 @@ public class DarkMatter extends LinearOpMode {
         //Capping position
         else if (gamepad2.x) {
             ap.setTargetPosition(-4100);
+            ar.setTargetPosition(-1425);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ar.setVelocity(1500);
             ap.setVelocity(2500);
         }
         if (!ap.isBusy()) {
             ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        if (!ar.isBusy()) {
+            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
     //
@@ -199,15 +211,34 @@ public class DarkMatter extends LinearOpMode {
             quacking = true;
             duck.setPower(0.5 * quackerMode);
         }
-        if (quacker.seconds() > 0.2 && quacker.seconds() < 1.3) {
-            duck.setPower(0.72 * quackerMode);
+//Slow
+        if (gamepad1.a) {
+            if (quacker.seconds() > 0.2 && quacker.seconds() < 1.5) {
+                duck.setPower(0.6 * quackerMode);
+            }
+            else if (quacker.seconds() > 1.5 && quacker.seconds() < 1.9) {
+                duck.setPower(quackerMode);
+            }
+            else if (quacker.seconds() > 1.7) {
+                quacking = false;
+                duck.setPower(0);
+            }
+            else {
+                duck.setPower(0.2 * quackerMode);
+            }
         }
-        else if (quacker.seconds() > 1.3 && quacker.seconds() < 1.8) {
-            duck.setPower(quackerMode);
-        }
-        else if (quacker.seconds() > 1.8) {
-            quacking = false;
-            duck.setPower(0);
+//Not slow
+        else {
+            if (quacker.seconds() > 0.2 && quacker.seconds() < 1.1) {
+                duck.setPower(0.75 * quackerMode);
+            }
+            else if (quacker.seconds() > 1.1 && quacker.seconds() < 1.7) {
+                duck.setPower(quackerMode);
+            }
+            else if (quacker.seconds() > 1.7) {
+                quacking = false;
+                duck.setPower(0);
+            }
         }
     }
     @Override
