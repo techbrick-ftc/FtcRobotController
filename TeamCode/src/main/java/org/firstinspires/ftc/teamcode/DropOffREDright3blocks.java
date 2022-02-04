@@ -131,6 +131,12 @@ public class DropOffREDright3blocks extends LinearOpMode {
             ar.setVelocity(speedYaw);
         }
     }
+    public void toEncoder() {
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
     public void runOpMode() {
 //Setting variables
         fl = hardwareMap.get(DcMotorEx.class, "fl");
@@ -192,40 +198,35 @@ public class DropOffREDright3blocks extends LinearOpMode {
             armPosDegree(0, 0, -248, 900);
             sleep(400);
         }
+        toEncoder();
         cs1.setPower(-0.45);
         cs2.setPower(0.45);
         sleep(1200);
         cs1.setPower(0);
         cs2.setPower(0);
 //PICKUP #1
-        if (tsleft.isPressed() || tsright.isPressed()) {
-            runInches(35, direction.right, 1200);
+        if (tsleft.isPressed() && !tsright.isPressed()) {
+            runInches(28, direction.right, 1200);
         }
         else {
-            runInches(30, direction.right, 1200);
+            runInches(34, direction.right, 1200);
         }
         sleep(500);
         armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree90, 1300);
-        sleep(1500);
-        runInches(21, direction.forward, 1300);
+        sleep(1700);
+        toEncoder();
+        runInches(21, direction.forward, 1100);
         armPos(armPositionsPitch.intake, 2000, armPositionsYaw.current, 0);
-        sleep(1300);
-        fl.setVelocity(0);
-        fr.setVelocity(0);
-        rl.setVelocity(0);
-        rr.setVelocity(0);
+        while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+        toEncoder();
         cs1.setPower(0.55);
         cs2.setPower(-0.55);
         int prevCurrent = fl.getCurrentPosition();
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fl.setVelocity(500);
         fr.setVelocity(500);
         rl.setVelocity(500);
         rr.setVelocity(500);
-        while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (22 * tpi_d) && opModeIsActive()) {
+        while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (23 * tpi_d) && opModeIsActive()) {
             telemetry.addData("FL", fl.getCurrentPosition());
             telemetry.addData("FR", fr.getCurrentPosition());
             telemetry.addData("RL", rl.getCurrentPosition());
@@ -243,40 +244,35 @@ public class DropOffREDright3blocks extends LinearOpMode {
             cs2.setPower(0);
             armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
             sleep(200);
-            runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 27), direction.backward, 1500);
-            sleep(2000);
-            runInches(23, direction.left, 1500);
-            sleep(1100);
-            cs1.setPower(-0.4);
-            cs2.setPower(0.4);
+            runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 27), direction.backward, 1300);
+            sleep(2200);
+            toEncoder();
+            runInches(22, direction.left, 1300);
+            sleep(1300);
+            cs1.setPower(-0.35);
+            cs2.setPower(0.35);
             sleep(900);
             cs1.setPower(0);
             cs2.setPower(0);
 //Pickup #2
-            runInches(26, direction.right, 1200);
+            runInches(25, direction.right, 1200);
             sleep(400);
             armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree90, 1300);
             sleep(1100);
-            runInches(27, direction.forward, 1300);
+            toEncoder();
+            runInches(27, direction.forward, 1100);
             armPos(armPositionsPitch.intake, 2200, armPositionsYaw.current, 0);
-            sleep(1500);
-            fl.setVelocity(0);
-            fr.setVelocity(0);
-            rl.setVelocity(0);
-            rr.setVelocity(0);
+            while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
             cs1.setPower(0.55);
             cs2.setPower(-0.55);
+            toEncoder();
             prevCurrent = fl.getCurrentPosition();
-            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fl.setVelocity(500);
             fr.setVelocity(500);
             rl.setVelocity(500);
             rr.setVelocity(500);
 
-            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (22 * tpi_d) && opModeIsActive()) {
+            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (24 * tpi_d) && opModeIsActive()) {
                 telemetry.addData("FL", fl.getCurrentPosition());
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
@@ -295,24 +291,27 @@ public class DropOffREDright3blocks extends LinearOpMode {
             cs2.setPower(0);
             armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
             sleep(200);
-            runInches((int)Math.round(((fl.getCurrentPosition()) - prevCurrent) / tpi_d + 27), direction.backward, 1400);
-            sleep(2000);
-            runInches(23, direction.left, 1500);
-            sleep(1100);
-            cs1.setPower(-0.4);
-            cs2.setPower(0.4);
+            runInches((int)Math.round(((fl.getCurrentPosition()) - prevCurrent) / tpi_d + 27), direction.backward, 1300);
+            sleep(2500);
+            toEncoder();
+            runInches(22, direction.left, 1300);
+            sleep(1300);
+            toEncoder();
+            cs1.setPower(-0.35);
+            cs2.setPower(0.35);
             sleep(900);
             cs1.setPower(0);
             cs2.setPower(0);
 //Park
-            runInches(26, direction.right, 1200);
+            runInches(25, direction.right, 1200);
             sleep(400);
             armPos(armPositionsPitch.low, 2200, armPositionsYaw.current, 0);
-            armPosDegree(0, 0, -75, 1200);
+            armPosDegree(0, 0, -78, 1200);
             sleep(1100);
-            runInches(27, direction.forward, 1500);
+            toEncoder();
+            runInches(27, direction.forward, 1400);
             armPos(armPositionsPitch.intake, 2200, armPositionsYaw.current, 0);
-            sleep(1000);
+            sleep(1200);
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -323,7 +322,7 @@ public class DropOffREDright3blocks extends LinearOpMode {
             fr.setVelocity(500);
             rl.setVelocity(500);
             rr.setVelocity(500);
-            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (20 * tpi_d) && opModeIsActive()) {
+            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (24 * tpi_d) && opModeIsActive()) {
                 telemetry.addData("FL", fl.getCurrentPosition());
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());

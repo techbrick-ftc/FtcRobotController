@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.RobotConstants.light;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -85,10 +86,10 @@ public class DarkMatter extends LinearOpMode {
     public void armRotation() {
         double onx = gamepad2.left_stick_x;
         if (onx > 0.05 && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 800);
+            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 950);
         }
         else if (onx < -0.05 && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 800);
+            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 950);
         }
         else if (gamepad2.dpad_right && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             ar.setVelocity(200);
@@ -136,10 +137,10 @@ public class DarkMatter extends LinearOpMode {
         //Level 3 shipping hub position
         else if (gamepad2.y) {
             ap.setTargetPosition(-3350);
-            ar.setTargetPosition(-1425);
+            ar.setTargetPosition(-1425 + yawOffSet);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ar.setVelocity(1300);
+            ar.setVelocity(1200);
             ap.setVelocity(2500);
         }
         //TSE Pickup
@@ -160,10 +161,10 @@ public class DarkMatter extends LinearOpMode {
         //Capping position
         else if (gamepad2.x) {
             ap.setTargetPosition(-4100);
-            ar.setTargetPosition(-1425);
+            ar.setTargetPosition(-1425 + yawOffSet);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ar.setVelocity(1500);
+            ar.setVelocity(1200);
             ap.setVelocity(2500);
         }
         if (!ap.isBusy()) {
@@ -209,33 +210,33 @@ public class DarkMatter extends LinearOpMode {
             quacker.reset();
             quackingOn = quackerMode;
             quacking = true;
-            duck.setPower(0.5 * quackerMode);
+            duck.setPower(0.38 * quackerMode);
         }
 //Slow
-        if (gamepad1.a) {
+        if (gamepad1.left_bumper) {
             if (quacker.seconds() > 0.2 && quacker.seconds() < 1.5) {
-                duck.setPower(0.6 * quackerMode);
+                duck.setPower(0.45 * quackerMode);
             }
-            else if (quacker.seconds() > 1.5 && quacker.seconds() < 1.9) {
+            else if (quacker.seconds() > 1.5 && quacker.seconds() < 1.8) {
                 duck.setPower(quackerMode);
             }
-            else if (quacker.seconds() > 1.7) {
+            else if (quacker.seconds() > 1.8) {
                 quacking = false;
                 duck.setPower(0);
             }
             else {
-                duck.setPower(0.2 * quackerMode);
+                duck.setPower(0.3 * quackerMode);
             }
         }
 //Not slow
         else {
             if (quacker.seconds() > 0.2 && quacker.seconds() < 1.1) {
-                duck.setPower(0.75 * quackerMode);
+                duck.setPower(0.56 * quackerMode);
             }
-            else if (quacker.seconds() > 1.1 && quacker.seconds() < 1.7) {
+            else if (quacker.seconds() > 1.1 && quacker.seconds() < 1.5) {
                 duck.setPower(quackerMode);
             }
-            else if (quacker.seconds() > 1.7) {
+            else if (quacker.seconds() > 1.5) {
                 quacking = false;
                 duck.setPower(0);
             }
@@ -403,6 +404,18 @@ public class DarkMatter extends LinearOpMode {
                 cp1.copy(gamepad1);
                 cp2.copy(gamepad2);
             } catch (Exception ignored) {}
+            if (light) {
+                fl.setDirection(DcMotorSimple.Direction.FORWARD);
+                rl.setDirection(DcMotorSimple.Direction.FORWARD);
+                fr.setDirection(DcMotorSimple.Direction.REVERSE);
+                rr.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            else {
+                fl.setDirection(DcMotorSimple.Direction.REVERSE);
+                rl.setDirection(DcMotorSimple.Direction.REVERSE);
+                fr.setDirection(DcMotorSimple.Direction.FORWARD);
+                rr.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
             idle();
         }
         for (DcMotor motor : all) {
