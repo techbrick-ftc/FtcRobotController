@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.RobotConstants.light;
+import static org.firstinspires.ftc.teamcode.RobotConstants.speedUp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -337,6 +337,7 @@ public class DarkMatter extends LinearOpMode {
                 }
 
             }
+            speedUp(fl, fr, rl, rr);
             // Drives forward
             if (gamepad1.dpad_up) {
                 fl.setVelocity(1600);
@@ -404,18 +405,6 @@ public class DarkMatter extends LinearOpMode {
                 cp1.copy(gamepad1);
                 cp2.copy(gamepad2);
             } catch (Exception ignored) {}
-            if (light) {
-                fl.setDirection(DcMotorSimple.Direction.FORWARD);
-                rl.setDirection(DcMotorSimple.Direction.FORWARD);
-                fr.setDirection(DcMotorSimple.Direction.REVERSE);
-                rr.setDirection(DcMotorSimple.Direction.REVERSE);
-            }
-            else {
-                fl.setDirection(DcMotorSimple.Direction.REVERSE);
-                rl.setDirection(DcMotorSimple.Direction.REVERSE);
-                fr.setDirection(DcMotorSimple.Direction.FORWARD);
-                rr.setDirection(DcMotorSimple.Direction.FORWARD);
-            }
             idle();
         }
         for (DcMotor motor : all) {
