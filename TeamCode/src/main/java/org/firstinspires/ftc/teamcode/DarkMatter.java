@@ -131,8 +131,8 @@ public class DarkMatter extends LinearOpMode {
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
             runningInput = true;
-            cs1.setPower(0.55);
-            cs2.setPower(-0.55);
+            cs1.setPower(1);
+            cs2.setPower(-1);
         }
         //Level 3 shipping hub position
         else if (gamepad2.y) {
@@ -149,8 +149,8 @@ public class DarkMatter extends LinearOpMode {
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
             runningInput = true;
-            cs1.setPower(0.55);
-            cs2.setPower(-0.55);
+            cs1.setPower(1);
+            cs2.setPower(-1);
         }
         //Shared shipping hub position
         else if (gamepad2.b && !gamepad2.start && !gamepad1.start) {
@@ -180,14 +180,14 @@ public class DarkMatter extends LinearOpMode {
     public void inputOutputControl() {
         //Runs servos to output item
         if (gamepad2.right_trigger > 0.05) {
-            cs1.setPower(-0.35);
-            cs2.setPower(0.35);
+            cs1.setPower(-0.55);
+            cs2.setPower(0.55);
             runningInput = false;
         }
         //Runs servos to input item
         else if (!ts1.isPressed() && gamepad2.right_bumper) {
-            cs1.setPower(0.55);
-            cs2.setPower(-0.55);
+            cs1.setPower(1);
+            cs2.setPower(-1);
             runningInput = true;
         }
         // If none, sets power to 0
@@ -214,7 +214,7 @@ public class DarkMatter extends LinearOpMode {
         }
 //Slow
         if (gamepad1.left_bumper) {
-            if (quacker.seconds() > 0.2 && quacker.seconds() < 1.5) {
+            if (quacker.seconds() > 0.15 && quacker.seconds() < 1.5) {
                 duck.setPower(0.45 * quackerMode);
             }
             else if (quacker.seconds() > 1.5 && quacker.seconds() < 1.8) {
@@ -230,7 +230,7 @@ public class DarkMatter extends LinearOpMode {
         }
 //Not slow
         else {
-            if (quacker.seconds() > 0.2 && quacker.seconds() < 1.1) {
+            if (quacker.seconds() > 0.15 && quacker.seconds() < 1.1) {
                 duck.setPower(0.56 * quackerMode);
             }
             else if (quacker.seconds() > 1.1 && quacker.seconds() < 1.5) {

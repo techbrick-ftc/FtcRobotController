@@ -7,10 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+
 import org.firstinspires.ftc.teamcode.libs.Globals;
 
-@Autonomous(name="RED DROP OFF: RIGHT 3 blocks")
-public class DropOffREDright3blocks extends LinearOpMode {
+@Autonomous(name="Duck Blue Right")
+public class DuckBlueright extends LinearOpMode {
     //Global Variables
     //Ticks For Yaw: 2850 * angle / 360
     DcMotorEx fl;
@@ -19,6 +20,7 @@ public class DropOffREDright3blocks extends LinearOpMode {
     DcMotorEx rr;
     DcMotorEx ar;
     DcMotorEx ap;
+    DcMotorEx duck;
     DcMotor led;
     CRServo cs1;
     CRServo cs2;
@@ -33,7 +35,7 @@ public class DropOffREDright3blocks extends LinearOpMode {
     final int ticksDegree90Yaw = -712;
     final int ticksDegree270Yaw = -2138;
     final int ticksDegree180Yaw = -1425;
-    public void runInches(int inches, direction direct, double speed) {
+    public void runInches(double inches, direction direct, double speed) {
         if (direct == direction.forward) {
             fl.setTargetPosition((int)(Math.round(tpi_d * inches) + fl.getCurrentPosition()));
             fr.setTargetPosition((int)(Math.round(tpi_d * inches) + fr.getCurrentPosition()));
@@ -58,6 +60,25 @@ public class DropOffREDright3blocks extends LinearOpMode {
             rl.setTargetPosition((int)(Math.round(tpi_s * inches) + rl.getCurrentPosition()));
             rr.setTargetPosition((int)(Math.round(tpi_s * -inches) + rr.getCurrentPosition()));
         }
+        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fl.setVelocity(speed);
+        fr.setVelocity(speed);
+        rl.setVelocity(speed);
+        rr.setVelocity(speed);
+    }
+    public void turn(int degrees, int speed) {
+        toEncoder();
+        int ticksFL = Math.round((-degrees * 2770 / 360) + fl.getCurrentPosition());
+        int ticksFR = Math.round((degrees * 2770 / 360) + fr.getCurrentPosition());
+        int ticksRL = Math.round((-degrees * 2770 / 360) + rl.getCurrentPosition());
+        int ticksRR = Math.round((degrees * 2770 / 360) + rr.getCurrentPosition());
+        fl.setTargetPosition(Math.round(ticksFL));
+        fr.setTargetPosition(Math.round(ticksFR));
+        rl.setTargetPosition(Math.round(ticksRL));
+        rr.setTargetPosition(Math.round(ticksRR));
         fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -151,6 +172,7 @@ public class DropOffREDright3blocks extends LinearOpMode {
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         tsleft = hardwareMap.get(TouchSensor.class, "tsleft");
         tsright = hardwareMap.get(TouchSensor.class, "tsright");
+        duck = hardwareMap.get(DcMotorEx.class, "quack");
         ar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -205,152 +227,37 @@ public class DropOffREDright3blocks extends LinearOpMode {
         sleep(1200);
         cs1.setPower(0);
         cs2.setPower(0);
-//PICKUP #1
-        if (tsleft.isPressed() && !tsright.isPressed()) {
-            runInches(28, direction.right, 1200);
-        }
-        else {
-            runInches(34, direction.right, 1200);
-        }
-        sleep(500);
-        armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree90, 1300);
-        sleep(1700);
+        armPos(armPositionsPitch.current, 0, armPositionsYaw.degree180, 1100);
+        sleep(700);
+        runInches(14, direction.right, 1000);
+        sleep(1450);
+        turn(90, 300);
+        sleep(4100);
         toEncoder();
-        runInches(21, direction.forward, 1100);
-        armPos(armPositionsPitch.intake, 2000, armPositionsYaw.current, 0);
-        while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+        runInches(37, direction.right, 1000);
+        sleep(2200);
+        runInches(6.5, direction.backward, 1000);
+        sleep(100);
+        armPos(armPositionsPitch.middle, 2500, armPositionsYaw.degree225, 800);
+        sleep(900);
+        duck.setPower(0.4);
+        sleep(2250);
+        duck.setPower(0);
+        sleep (100);
+        armPos(armPositionsPitch.up, 2500, armPositionsYaw.degree270, 800);
+        runInches(24, direction.left, 1000);
+        sleep(1450);
+        turn(-90, 600);
+        sleep(1500);
         toEncoder();
-        cs1.setPower(0.55);
-        cs2.setPower(-0.55);
-        int prevCurrent = fl.getCurrentPosition();
-        fl.setVelocity(500);
-        fr.setVelocity(500);
-        rl.setVelocity(500);
-        rr.setVelocity(500);
-        while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (23 * tpi_d) && opModeIsActive()) {
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("RL", rl.getCurrentPosition());
-            telemetry.addData("RR", rr.getCurrentPosition());
-            telemetry.addData("AR", ar.getCurrentPosition());
-            telemetry.addData("AP", ap.getCurrentPosition());
-            telemetry.update();
-        }
-        boolean on = false;
-        if (fl.getCurrentPosition() < prevCurrent + (23 * tpi_d)) {
-            fl.setVelocity(0);
-            fr.setVelocity(0);
-            rl.setVelocity(0);
-            rr.setVelocity(0);
-            cs1.setPower(0);
-            cs2.setPower(0);
-            on = true;
-            armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
-            sleep(200);
-            runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 27), direction.backward, 1300);
-            sleep(2300);
-            toEncoder();
-            runInches(21, direction.left, 1300);
-            sleep(1500);
-            toEncoder();
-            cs1.setPower(-0.55);
-            cs2.setPower(0.55);
-            sleep(900);
-            cs1.setPower(0);
-            cs2.setPower(0);
-//Pickup #2
-            runInches(25, direction.right, 1200);
-            sleep(400);
-            armPos(armPositionsPitch.low, 2200, armPositionsYaw.degree90, 1300);
-            sleep(1100);
-            toEncoder();
-            runInches(27, direction.forward, 1100);
-            armPos(armPositionsPitch.intake, 2200, armPositionsYaw.current, 0);
-            while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-            cs1.setPower(1);
-            cs2.setPower(-1);
-            toEncoder();
-            prevCurrent = fl.getCurrentPosition();
-            fl.setVelocity(500);
-            fr.setVelocity(500);
-            rl.setVelocity(500);
-            rr.setVelocity(500);
-
-            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (25 * tpi_d) && opModeIsActive()) {
-                telemetry.addData("FL", fl.getCurrentPosition());
-                telemetry.addData("FR", fr.getCurrentPosition());
-                telemetry.addData("RL", rl.getCurrentPosition());
-                telemetry.addData("RR", rr.getCurrentPosition());
-                telemetry.addData("AR", ar.getCurrentPosition());
-                telemetry.addData("AP", ap.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        if (fl.getCurrentPosition() < prevCurrent + (25 * tpi_d) && on) {
-            fl.setVelocity(0);
-            fr.setVelocity(0);
-            rl.setVelocity(0);
-            rr.setVelocity(0);
-            cs1.setPower(0);
-            cs2.setPower(0);
-            armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
-            sleep(200);
-            runInches((int)Math.round(((fl.getCurrentPosition()) - prevCurrent) / tpi_d + 27), direction.backward, 1300);
-            sleep(2600);
-            toEncoder();
-            runInches(21, direction.left, 1300);
-            sleep(1500);
-            toEncoder();
-            cs1.setPower(-0.55);
-            cs2.setPower(0.55);
-            sleep(900);
-            cs1.setPower(0);
-            cs2.setPower(0);
-//Park
-            runInches(25, direction.right, 1200);
-            sleep(400);
-            armPos(armPositionsPitch.low, 2200, armPositionsYaw.current, 0);
-            armPosDegree(0, 0, -78, 1200);
-            sleep(1100);
-            toEncoder();
-            runInches(27, direction.forward, 1400);
-            armPos(armPositionsPitch.intake, 2200, armPositionsYaw.current, 0);
-            while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-            toEncoder();
-            cs1.setPower(1);
-            cs2.setPower(-1);
-            fl.setVelocity(500);
-            fr.setVelocity(500);
-            rl.setVelocity(500);
-            rr.setVelocity(500);
-            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (24 * tpi_d) && opModeIsActive()) {
-                telemetry.addData("FL", fl.getCurrentPosition());
-                telemetry.addData("FR", fr.getCurrentPosition());
-                telemetry.addData("RL", rl.getCurrentPosition());
-                telemetry.addData("RR", rr.getCurrentPosition());
-                telemetry.addData("AR", ar.getCurrentPosition());
-                telemetry.addData("AP", ap.getCurrentPosition());
-                telemetry.update();
-            }
-            cs1.setPower(0);
-            cs2.setPower(0);
-            fl.setVelocity(0);
-            fr.setVelocity(0);
-            rl.setVelocity(0);
-            rr.setVelocity(0);
-        }
-        else {
-            fl.setVelocity(0);
-            fr.setVelocity(0);
-            rl.setVelocity(0);
-            rr.setVelocity(0);
-            cs1.setPower(-0.1);
-            cs2.setPower(0.1);
-            sleep(4);
-            cs1.setPower(0);
-            cs2.setPower(0);
-        }
-        led.setPower(0);
+        runInches(15, direction.right, 1000);
+        sleep(4000);
+        runInches(78, direction.backward, 1500);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        sleep(5000);
         fl.setPower(0);
         fr.setPower(0);
         rl.setPower(0);
