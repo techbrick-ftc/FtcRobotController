@@ -29,9 +29,9 @@ public class DuckBlueright extends LinearOpMode {
     TouchSensor tsright;
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
-    final int ticksHighPitch = -3100;
-    final int ticksMiddlePitch = -1600;
-    final int ticksLowPitch = -800;
+    final int ticksHighPitch = -1585;
+    final int ticksMiddlePitch = -818;
+    final int ticksLowPitch = -409;
     final int ticksDegree90Yaw = -712;
     final int ticksDegree270Yaw = -2138;
     final int ticksDegree180Yaw = -1425;
@@ -71,10 +71,10 @@ public class DuckBlueright extends LinearOpMode {
     }
     public void turn(int degrees, int speed) {
         toEncoder();
-        int ticksFL = Math.round((-degrees * 2770 / 360) + fl.getCurrentPosition());
-        int ticksFR = Math.round((degrees * 2770 / 360) + fr.getCurrentPosition());
-        int ticksRL = Math.round((-degrees * 2770 / 360) + rl.getCurrentPosition());
-        int ticksRR = Math.round((degrees * 2770 / 360) + rr.getCurrentPosition());
+        int ticksFL = Math.round((-degrees * 2790 / 360) + fl.getCurrentPosition());
+        int ticksFR = Math.round((degrees * 2790 / 360) + fr.getCurrentPosition());
+        int ticksRL = Math.round((-degrees * 2790 / 360) + rl.getCurrentPosition());
+        int ticksRR = Math.round((degrees * 2790 / 360) + rr.getCurrentPosition());
         fl.setTargetPosition(Math.round(ticksFL));
         fr.setTargetPosition(Math.round(ticksFR));
         rl.setTargetPosition(Math.round(ticksRL));
@@ -105,16 +105,12 @@ public class DuckBlueright extends LinearOpMode {
             ap.setTargetPosition(ticksLowPitch);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        else if (positionPitch == armPositionsPitch.duckPos) {
-            ap.setTargetPosition(-1970);
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
         else if (positionPitch == armPositionsPitch.up) {
-            ap.setTargetPosition(-5000);
+            ap.setTargetPosition(-2557);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         else if (positionPitch == armPositionsPitch.lvl1) {
-            ap.setTargetPosition(-650);
+            ap.setTargetPosition(-332);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         if (positionYaw == armPositionsYaw.start) {
@@ -142,7 +138,7 @@ public class DuckBlueright extends LinearOpMode {
     }
     public void armPosDegree(int positionPitch, int speedPitch, int positionYaw, int speedYaw) {
         if (positionPitch != 0) {
-            ap.setTargetPosition(-18043 * positionPitch / 360);
+            ap.setTargetPosition(-9228 * positionPitch / 360);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(speedPitch);
         }
@@ -203,61 +199,70 @@ public class DuckBlueright extends LinearOpMode {
         sleep(1400);
         toEncoder();
         if (tsleft.isPressed() && !tsright.isPressed()) {
-            runInches(6, direction.right, 800);
+            runInches(6, direction.right, 900);
             armPos(armPositionsPitch.lvl1, 2200, armPositionsYaw.current, 0);
-            sleep(800);
+            sleep(500);
             armPosDegree(0, 0, -236, 700);
             sleep(400);
         }
         else if (!tsleft.isPressed() && tsright.isPressed()) {
             armPos(armPositionsPitch.middle, 2200, armPositionsYaw.current, 0);
-            sleep(800);
+            sleep(500);
             armPosDegree(0, 0, -248, 900);
             sleep(400);
         }
         else {
             armPos(armPositionsPitch.output, 2500, armPositionsYaw.current, 0);
-            sleep(800);
+            sleep(500);
             armPosDegree(0, 0, -248, 900);
             sleep(400);
         }
         toEncoder();
-        cs1.setPower(-0.45);
-        cs2.setPower(0.45);
-        sleep(1200);
+        cs1.setPower(-0.55);
+        cs2.setPower(0.55);
+        sleep(700);
         cs1.setPower(0);
         cs2.setPower(0);
-        armPos(armPositionsPitch.current, 0, armPositionsYaw.degree180, 1100);
+        armPos(armPositionsPitch.current, 0, armPositionsYaw.degree90, 1100);
         sleep(700);
-        runInches(14, direction.right, 1000);
+        if (tsleft.isPressed() && !tsright.isPressed()) {
+            runInches(8, direction.right, 1000);
+        }
+        else {
+            runInches(14, direction.right, 1000);
+        }
         sleep(1450);
-        turn(90, 300);
-        sleep(4100);
+        turn(90, 650);
+        sleep(2000);
         toEncoder();
         runInches(37, direction.right, 1000);
-        sleep(2200);
+        sleep(500);
+        armPos(armPositionsPitch.intake, 2500, armPositionsYaw.degree225, 800);
+        sleep(2000);
         runInches(6.5, direction.backward, 1000);
-        sleep(100);
-        armPos(armPositionsPitch.middle, 2500, armPositionsYaw.degree225, 800);
         sleep(900);
-        duck.setPower(0.4);
-        sleep(2250);
+        duck.setPower(0.48);
+        sleep(2500);
         duck.setPower(0);
-        sleep (100);
-        armPos(armPositionsPitch.up, 2500, armPositionsYaw.degree270, 800);
+        sleep(100);
+        armPos(armPositionsPitch.current, 0, armPositionsYaw.degree180, 800);
+        sleep(500);
         runInches(24, direction.left, 1000);
         sleep(1450);
-        turn(-90, 600);
-        sleep(1500);
+        turn(-90, 650);
+        sleep(2000);
         toEncoder();
         runInches(15, direction.right, 1000);
+        armPos(armPositionsPitch.up, 2500, armPositionsYaw.degree270, 800);
         sleep(4000);
-        runInches(78, direction.backward, 1500);
+        toEncoder();
+        sleep(100);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        sleep(5000);
+        runInches(78, direction.backward, 1500);
+        sleep(6000);
         fl.setPower(0);
         fr.setPower(0);
         rl.setPower(0);

@@ -27,9 +27,9 @@ public class DropOffREDright3blocks extends LinearOpMode {
     TouchSensor tsright;
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
-    final int ticksHighPitch = -3100;
-    final int ticksMiddlePitch = -1600;
-    final int ticksLowPitch = -800;
+    final int ticksHighPitch = -1585;
+    final int ticksMiddlePitch = -818;
+    final int ticksLowPitch = -409;
     final int ticksDegree90Yaw = -712;
     final int ticksDegree270Yaw = -2138;
     final int ticksDegree180Yaw = -1425;
@@ -84,16 +84,12 @@ public class DropOffREDright3blocks extends LinearOpMode {
             ap.setTargetPosition(ticksLowPitch);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        else if (positionPitch == armPositionsPitch.duckPos) {
-            ap.setTargetPosition(-1970);
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
         else if (positionPitch == armPositionsPitch.up) {
-            ap.setTargetPosition(-5000);
+            ap.setTargetPosition(-2557);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         else if (positionPitch == armPositionsPitch.lvl1) {
-            ap.setTargetPosition(-650);
+            ap.setTargetPosition(-332);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         if (positionYaw == armPositionsYaw.start) {
@@ -121,7 +117,7 @@ public class DropOffREDright3blocks extends LinearOpMode {
     }
     public void armPosDegree(int positionPitch, int speedPitch, int positionYaw, int speedYaw) {
         if (positionPitch != 0) {
-            ap.setTargetPosition(-18043 * positionPitch / 360);
+            ap.setTargetPosition(-9228 * positionPitch / 360);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(speedPitch);
         }

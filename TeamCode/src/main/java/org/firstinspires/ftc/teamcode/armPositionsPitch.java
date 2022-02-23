@@ -4,7 +4,6 @@ public enum armPositionsPitch {
     output,
     intake,
     low,
-    duckPos,
     up,
     middle,
     lvl1,

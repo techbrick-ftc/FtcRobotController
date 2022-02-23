@@ -85,10 +85,6 @@ public class DropOffREDright extends LinearOpMode {
             ap.setTargetPosition(ticksLowPitch);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        else if (positionPitch == armPositionsPitch.duckPos) {
-            ap.setTargetPosition(-1970);
-            ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
         else if (positionPitch == armPositionsPitch.up) {
             ap.setTargetPosition(-5000);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);

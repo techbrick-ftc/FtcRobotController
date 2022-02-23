@@ -81,9 +81,6 @@ public class DropOffBLUEright extends LinearOpMode {
         else if (positionPitch == armPositionsPitch.low) {
             ap.setTargetPosition(ticksLowPitch);
         }
-        else if (positionPitch == armPositionsPitch.duckPos) {
-            ar.setTargetPosition(ticksDuckPosPitch);
-        }
         else if (positionPitch == armPositionsPitch.up) {
             ar.setTargetPosition(ticksDuckPosUp);
         }
@@ -223,7 +220,7 @@ public class DropOffBLUEright extends LinearOpMode {
             telemetry.addData("AP", ap.getCurrentPosition());
             telemetry.update();
         }
-        armPos(armPositionsPitch.duckPos, 2000, armPositionsYaw.duckPos, 2000);
+        armPos(armPositionsPitch.middle, 2000, armPositionsYaw.duckPos, 2000);
         timerBreak.reset();
         while (!(timerBreak.seconds() > 1.5 || (fl.isBusy() || fr.isBusy() || rl.isBusy() || rr.isBusy() || ap.isBusy() || ar.isBusy()))) {
             telemetry.addData("FL", fl.getCurrentPosition());

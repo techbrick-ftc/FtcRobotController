@@ -29,6 +29,7 @@ public class DarkMatter extends LinearOpMode {
     DcMotorEx ap;
     CRServo cs1;
     CRServo cs2;
+    CRServo tmc;
     TouchSensor ts1;
     TouchSensor ts2;
     DcMotorEx led;
@@ -106,20 +107,20 @@ public class DarkMatter extends LinearOpMode {
     //
     public void armPitch() {
         //Arm up
-        if (gamepad2.left_bumper && (ap.getCurrentPosition() > -5650 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setVelocity(-2500);
+        if (gamepad2.left_bumper && (ap.getCurrentPosition() > -2890 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+            ap.setVelocity(-1300);
         }
         //Arm down
         else if (gamepad2.left_trigger > 0.05 && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setVelocity(1800);
+            ap.setVelocity(900);
         }
         //Arm up slow
-        else if (gamepad2.dpad_up && (ap.getCurrentPosition() > -5650 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setVelocity(-800);
+        else if (gamepad2.dpad_up && (ap.getCurrentPosition() > -2890 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+            ap.setVelocity(-250);
         }
         //Arm down slow
         else if (gamepad2.dpad_down && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
-            ap.setVelocity(800);
+            ap.setVelocity(250);
         }
         //Checks if not busy
         else if (!ap.isBusy()) {
@@ -136,7 +137,7 @@ public class DarkMatter extends LinearOpMode {
         }
         //Level 3 shipping hub position
         else if (gamepad2.y) {
-            ap.setTargetPosition(-3350);
+            ap.setTargetPosition(-1713);
             ar.setTargetPosition(-1425 + yawOffSet);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -145,7 +146,7 @@ public class DarkMatter extends LinearOpMode {
         }
         //TSE Pickup
         else if (gamepad2.guide) {
-            ap.setTargetPosition(-375);
+            ap.setTargetPosition(-192);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
             runningInput = true;
@@ -154,13 +155,13 @@ public class DarkMatter extends LinearOpMode {
         }
         //Shared shipping hub position
         else if (gamepad2.b && !gamepad2.start && !gamepad1.start) {
-            ap.setTargetPosition(-875);
+            ap.setTargetPosition(-448);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ap.setVelocity(2500);
         }
         //Capping position
         else if (gamepad2.x) {
-            ap.setTargetPosition(-4100);
+            ap.setTargetPosition(-2097);
             ar.setTargetPosition(-1425 + yawOffSet);
             ap.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -255,6 +256,7 @@ public class DarkMatter extends LinearOpMode {
         duck = hardwareMap.get(DcMotorEx.class, "quack");
         cs1 = hardwareMap.get(CRServo.class, "cs1");
         cs2 = hardwareMap.get(CRServo.class, "cs2");
+        tmc = hardwareMap.get(CRServo.class, "tmc");
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         ts2 = hardwareMap.get(TouchSensor.class, "ts2");
         led = hardwareMap.get(DcMotorEx.class, "B1");
@@ -337,6 +339,14 @@ public class DarkMatter extends LinearOpMode {
                 }
 
             }
+            //Capper tape
+            if (Math.abs(gamepad2.right_stick_y) > 0.1 && Math.abs(gamepad2.right_stick_x) > 0.1) {
+                tmc.setPower(Math.sqrt(gamepad2.right_stick_x * gamepad2.right_stick_x * ((gamepad2.right_stick_x > 0) ? 1 : -1) + gamepad2.right_stick_y * gamepad2.right_stick_y * ((gamepad2.right_stick_y > 0) ? 1 : -1) ));
+            }
+            else {
+                tmc.setPower(0);
+            }
+
             speedUp(fl, fr, rl, rr);
             // Drives forward
             if (gamepad1.dpad_up) {
