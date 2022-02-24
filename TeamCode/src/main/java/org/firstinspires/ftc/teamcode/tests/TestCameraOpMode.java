@@ -16,22 +16,17 @@ import static java.lang.Thread.sleep;
 
 import android.util.Log;
 
+import org.firstinspires.ftc.teamcode.libs.Globals;
+
 @TeleOp(name="Test T265", group="Test")
-public class TestCameraOpMode extends OpMode
-{
+public class TestCameraOpMode extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
-    private static T265Camera slamra = null;
-    private static boolean slamraSet = false;
-    private final String TAG = "TestCameraOpMode";
 
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
 
     @Override
     public void init() {
-        if (slamra == null) {
-            slamra = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
-            Log.v(TAG, "slamra initialized");
-        }
+        Globals.setupCamera(hardwareMap);
     }
 
     @Override
@@ -40,15 +35,21 @@ public class TestCameraOpMode extends OpMode
 
     @Override
     public void start() {
-        slamra.start();
-        try { sleep(300); } catch (InterruptedException ignored) {}
-        if (!slamraSet) { slamra.setPose(new Pose2d(0, 0, new Rotation2d(0))); slamraSet = true; }
-        /*
-            The setPose function gets the reference position (for rotation) from the library itself,
-            after the library has applied the previous rotation which makes the setPose function
-            negate itself. Basically.
-         */
-        slamra.getLastReceivedCameraUpdate();
+        Globals.startCamera();
+//        try {
+//            sleep(3000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        while (Globals.getCamera().getLastReceivedCameraUpdate().pose.getX() == 0 &&
+            Globals.getCamera().getLastReceivedCameraUpdate().pose.getY() == 0 &&
+            Globals.getCamera().getLastReceivedCameraUpdate().pose.getRotation().getRadians() == 0)
+            idle(); System.out.println("hi");
+        Globals.setPose(new Pose2d(0.,10. * 0.0254,new Rotation2d(PI)));
+    }
+
+    private void idle() {
+        try { sleep(1); } catch (Exception ignored) {}
     }
 
     @Override
@@ -58,7 +59,7 @@ public class TestCameraOpMode extends OpMode
         TelemetryPacket packet = new TelemetryPacket();
         Canvas field = packet.fieldOverlay();
 
-        T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
+        T265Camera.CameraUpdate up = Globals.getCamera().getLastReceivedCameraUpdate();
         if (up == null) return;
 
         // We divide by 0.0254 to convert meters to inches
@@ -80,10 +81,7 @@ public class TestCameraOpMode extends OpMode
 
     @Override
     public void stop() {
-        if (slamra.isStarted()) {
-            slamra.stop();
-            slamra.getLastReceivedCameraUpdate();
-        }
+        Globals.stopCamera();
     }
 
 }

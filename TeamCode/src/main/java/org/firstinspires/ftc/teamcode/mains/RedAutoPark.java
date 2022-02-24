@@ -20,7 +20,7 @@ public class RedAutoPark extends LinearOpMode implements TeleAuto {
         // Init
         robot.setup(hardwareMap);
 
-        robot.rlMotor().setDirection(DcMotor.Direction.REVERSE);
+        robot.flMotor().setDirection(DcMotor.Direction.REVERSE);
         robot.rrMotor().setDirection(DcMotor.Direction.REVERSE);
 
         robot.flMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -35,11 +35,11 @@ public class RedAutoPark extends LinearOpMode implements TeleAuto {
             sleep(1000);
             robot.getLifter().setPower(0);
 
-            strafe(0.5, 1200);
-            forwards(0.5, 700);
-            sleep(100);
-            strafe(0.5, 1500);
-            sleep(500);
+            strafe(0.3, 1200); // 0.5
+//            forwards(0.5, 700); // 0.5
+//            sleep(100);
+//            strafe(0.5, 1500); // 0.5
+//            sleep(500);
 
             robot.getLifter().setPower(-1);
             sleep(1000);
@@ -49,9 +49,9 @@ public class RedAutoPark extends LinearOpMode implements TeleAuto {
 
     private void forwards(double power, int time) {
         robot.flMotor().setPower(-power);
-        robot.frMotor().setPower(-power);
+        robot.frMotor().setPower(power);
         robot.rlMotor().setPower(-power);
-        robot.rrMotor().setPower(-power);
+        robot.rrMotor().setPower(power);
 
         sleep(time);
 
@@ -60,9 +60,9 @@ public class RedAutoPark extends LinearOpMode implements TeleAuto {
 
     private void strafe(double power, int time) {
         robot.flMotor().setPower(-power);
-        robot.frMotor().setPower(power);
+        robot.frMotor().setPower(-power);
         robot.rlMotor().setPower(power);
-        robot.rrMotor().setPower(-power);
+        robot.rrMotor().setPower(power);
 
         sleep(time);
 

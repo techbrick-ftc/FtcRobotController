@@ -67,7 +67,7 @@ public class Main extends LinearOpMode {
         int armMax = 350;
 
         // Lifter positions
-        int lifterMin =   376;
+        int lifterMin =     0;
         int lifterMid =   971;
         int lifterDuck = 6943;
         int lifterMax = 11935;
@@ -77,7 +77,7 @@ public class Main extends LinearOpMode {
         double spinSpeed = .7;
         ElapsedTime rampTime = new ElapsedTime();
 
-        boolean slower = false;
+        boolean slower = true;
         double slowerSpeed = .5;
 
         // Toast notification because I can
@@ -92,9 +92,9 @@ public class Main extends LinearOpMode {
             // TeleOp loop
             drive.gyro();
             drive.Drive(
-                    !slower ? -gamepad1.left_stick_x : -gamepad1.left_stick_x * slowerSpeed,
-                    !slower ? gamepad1.left_stick_y : gamepad1.left_stick_y * slowerSpeed,
-                    !slower ? gamepad1.right_stick_x * 0.6 : gamepad1.right_stick_x * slowerSpeed * 0.6
+                    !slower ? gamepad1.left_stick_x : gamepad1.left_stick_x * slowerSpeed,
+                    !slower ? -gamepad1.left_stick_y : -gamepad1.left_stick_y * slowerSpeed,
+                    !slower ? -gamepad1.right_stick_x * 0.6 : -gamepad1.right_stick_x * slowerSpeed * 0.6
             );
 
             if (gamepad1.back) { drive.resetAngle(); }

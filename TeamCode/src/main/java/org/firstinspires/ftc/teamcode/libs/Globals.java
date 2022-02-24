@@ -46,10 +46,11 @@ public class Globals {
     }
 
     public static void setPose(Pose2d pose) {
-        if (!initialPoseSet) {
-            camera.setPose(pose);
-            initialPoseSet = true;
-        }
+//        if (!initialPoseSet) {
+//            camera.setPose(pose);
+//            initialPoseSet = true;
+//        }
+        camera.setPose(pose);
     }
 
     public static void setupIMU(HardwareMap hardwareMap) {

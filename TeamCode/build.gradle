@@ -29,5 +29,10 @@ dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation 'com.spartronics4915.lib:ftc265:2.1.9'
+//    implementation files('lib/lib-release.aar')
+//    implementation('org.ftclib.ftclib:core:1.2.0') { // For geometry classes
+//        exclude group: 'org.ejml', module: 'ejml-all'
+//    }
+//    implementation 'com.intel.realsense:librealsense:2.41.1-ftc265@aar'
     implementation 'org.openftc:easyopencv:1.5.0'
 }

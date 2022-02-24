@@ -51,7 +51,7 @@ android {
     defaultConfig {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'
-        minSdkVersion 24
+        minSdkVersion 28
         targetSdkVersion 30
 
         def manifestFile = project(':FtcRobotController').file('src/main/AndroidManifest.xml');

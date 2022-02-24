@@ -1,24 +1,20 @@
 package org.firstinspires.ftc.teamcode.mains;
 
+import static java.lang.Math.PI;
 
 import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.spartronics4915.lib.T265Camera;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.libs.CameraAuto;
 import org.firstinspires.ftc.teamcode.libs.EasyOpenCVImportable;
@@ -26,12 +22,9 @@ import org.firstinspires.ftc.teamcode.libs.Globals;
 import org.firstinspires.ftc.teamcode.libs.Nikolaj;
 import org.firstinspires.ftc.teamcode.libs.TeleAuto;
 
-import static java.lang.Math.PI;
-
-import java.util.HashMap;
-
-@Autonomous()
-public class BlueDuck extends LinearOpMode implements TeleAuto {
+@Autonomous
+public class RedDuck extends LinearOpMode implements TeleAuto {
+    // Pre-init
     private final Nikolaj robot = new Nikolaj();
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
     private TelemetryPacket initPacket = new TelemetryPacket();
@@ -39,7 +32,8 @@ public class BlueDuck extends LinearOpMode implements TeleAuto {
     private final CameraAuto auto = new CameraAuto();
 
     int lifterDuck = 6943;
-
+    
+    @Override
     public void runOpMode() {
         // Init
         robot.setup(hardwareMap);
@@ -83,46 +77,10 @@ public class BlueDuck extends LinearOpMode implements TeleAuto {
             int detection = camera.getDetection();
             camera.stopDetection();
 
-//            while (opModeIsActive() && !gamepad1.a) {
-//                final int robotRadius = 9; // inches
-//                TelemetryPacket packet = new TelemetryPacket();
-//                Canvas field = packet.fieldOverlay();
-//
-//                T265Camera.CameraUpdate up = Globals.getCamera().getLastReceivedCameraUpdate();
-//                if (up == null) continue;
-//
-//                // We divide by 0.0254 to convert meters to inches
-//                Translation2d translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
-//                Rotation2d rotation = up.pose.getRotation();
-//
-//                field.strokeCircle(translation.getX(), translation.getY(), robotRadius);
-//                double arrowX = rotation.getCos() * robotRadius, arrowY = rotation.getSin() * robotRadius;
-//                double x1 = translation.getX() + arrowX / 2, y1 = translation.getY() + arrowY / 2;
-//                double x2 = translation.getX() + arrowX, y2 = translation.getY() + arrowY;
-//                field.strokeLine(x1, y1, x2, y2);
-//
-//                packet.put("X", translation.getX());
-//                packet.put("Y", translation.getY());
-//                packet.put("Angle", rotation.getRadians());
-//                packet.put("IMU Int", Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
-//                packet.put("IMU Ext", Globals.getImu().getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
-//
-//                telemetry.addData("X", translation.getX());
-//                telemetry.addData("Y", translation.getY());
-//                telemetry.addData("Angle", rotation.getRadians());
-//                telemetry.addData("IMU Int", Globals.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
-//                telemetry.addData("IMU Ext", Globals.getImu().getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle);
-//                telemetry.update();
-//
-//                packet.put("Final pos", detection);
-//                dashboard.sendTelemetryPacket(packet);
-//            }
-
             auto.goToPosition(0, -10, 0.3, this);
 
             auto.goToPosition(20, -10, 0.6, this);
 
-//            auto.goTo(24, -14, PI/2, 0.5, this);
             auto.goToRotation(-PI/2, 0.1, this);
 
             if (detection == 2) {
