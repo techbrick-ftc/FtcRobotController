@@ -340,8 +340,9 @@ public class DarkMatter extends LinearOpMode {
 
             }
             //Capper tape
-            if (Math.abs(gamepad2.right_stick_y) > 0.1 && Math.abs(gamepad2.right_stick_x) > 0.1) {
-                tmc.setPower(Math.sqrt(gamepad2.right_stick_x * gamepad2.right_stick_x * ((gamepad2.right_stick_x > 0) ? 1 : -1) + gamepad2.right_stick_y * gamepad2.right_stick_y * ((gamepad2.right_stick_y > 0) ? 1 : -1) ));
+            if (Math.abs(gamepad2.right_stick_y) > 0.075) {
+                try {tmc.setPower(-gamepad2.right_stick_y); }
+                catch (Exception ex) {telemetry.addLine(ex.toString());}
             }
             else {
                 tmc.setPower(0);
