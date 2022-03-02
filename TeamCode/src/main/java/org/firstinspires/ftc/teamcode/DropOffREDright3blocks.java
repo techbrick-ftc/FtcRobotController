@@ -62,10 +62,7 @@ public class DropOffREDright3blocks extends LinearOpMode {
         fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fl.setVelocity(speed);
-        fr.setVelocity(speed);
-        rl.setVelocity(speed);
-        rr.setVelocity(speed);
+        speedUp(speed);
     }
     public void armPos(armPositionsPitch positionPitch, int speedPitch, armPositionsYaw positionYaw, int speedYaw) {
         if (positionPitch == armPositionsPitch.intake) {
@@ -132,6 +129,17 @@ public class DropOffREDright3blocks extends LinearOpMode {
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public void speedUp(double maxSpeed) {
+        fl.setVelocity(maxSpeed / 2);
+        fr.setVelocity(maxSpeed / 2);
+        rl.setVelocity(maxSpeed / 2);
+        rr.setVelocity(maxSpeed / 2);
+        sleep(300);
+        fl.setVelocity(maxSpeed);
+        fr.setVelocity(maxSpeed);
+        rl.setVelocity(maxSpeed);
+        rr.setVelocity(maxSpeed);
     }
     public void runOpMode() {
 //Setting variables
@@ -346,6 +354,10 @@ public class DropOffREDright3blocks extends LinearOpMode {
             cs1.setPower(0);
             cs2.setPower(0);
         }
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         led.setPower(0);
         fl.setPower(0);
         fr.setPower(0);
