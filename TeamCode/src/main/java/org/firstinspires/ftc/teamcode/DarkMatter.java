@@ -85,22 +85,30 @@ public class DarkMatter extends LinearOpMode {
     //Arm Rotational Control
     //
     public void armRotation() {
-        if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
-            ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         double onx = gamepad2.left_stick_x;
         if (onx > 0.05 && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+            if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 950);
         }
         else if (onx < -0.05 && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+            if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 950);
         }
         else if (gamepad2.dpad_right && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+            if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ar.setVelocity(200);
         }
         else if (gamepad2.dpad_left && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+            if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ar.setVelocity(-200);
         }
         else if (!ar.isBusy()) {
+            if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
+                ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ar.setVelocity(0);
         }
     }
@@ -121,16 +129,16 @@ public class DarkMatter extends LinearOpMode {
             ap.setVelocity(900);
         }
         //Arm up slow
-        else if (gamepad2.dpad_up && (ap.getCurrentPosition() > -2890 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+        else if (gamepad2.right_stick_y < -0.05 && (ap.getCurrentPosition() > -2890 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ap.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setVelocity(-250);
+            ap.setVelocity(-350);
         }
         //Arm down slow
-        else if (gamepad2.dpad_down && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
+        else if (gamepad2.right_stick_y > 0.05 && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ap.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setVelocity(250);
+            ap.setVelocity(350);
         }
         //Checks if not busy
         else if (!ap.isBusy()) {
@@ -346,9 +354,11 @@ public class DarkMatter extends LinearOpMode {
 
             }
             //Capper tape
-            if (Math.abs(gamepad2.right_stick_y) > 0.075) {
-                try { tmc.setPower((float)Math.round(-gamepad2.right_stick_y * 10) / 10); }
-                catch (Exception ex) {telemetry.addLine(ex.toString());}
+            if (gamepad2.dpad_up) {
+                tmc.setPower(1);
+            }
+            else if (gamepad2.dpad_down) {
+                tmc.setPower(-1);
             }
             else {
                 tmc.setPower(0);
