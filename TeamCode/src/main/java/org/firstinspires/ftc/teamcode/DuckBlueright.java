@@ -249,13 +249,16 @@ public class DuckBlueright extends LinearOpMode {
         duck.setPower(0);
         sleep(100);
         armPos(armPositionsPitch.current, 0, armPositionsYaw.degree180, 800);
-        sleep(500);
+        sleep(800);
         runInches(4, direction.forward, 1000);
-        sleep(500);
+        sleep(800);
+        toEncoder();
         runInches(5, direction.right, 1000);
         sleep(500);
+        toEncoder();
         runInches(24, direction.left, 1000);
         sleep(1450);
+        toEncoder();
         turn(-90, 650);
         sleep(2000);
         toEncoder();
