@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.RobotConstants.speedUp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -33,6 +34,7 @@ public class DarkMatter extends LinearOpMode {
     TouchSensor ts1;
     TouchSensor ts2;
     DcMotorEx led;
+    ColorSensor cs;
     double angle = Math.PI/2;
     double driveSpeed = 1.00;
     double turningspeed = 0.5;
@@ -272,6 +274,7 @@ public class DarkMatter extends LinearOpMode {
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         ts2 = hardwareMap.get(TouchSensor.class, "ts2");
         led = hardwareMap.get(DcMotorEx.class, "B1");
+        cs = hardwareMap.get(ColorSensor.class, "colorSense");
         DcMotor[] all = {fl, fr, rl, rr, ap, ar, led};
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -290,13 +293,28 @@ public class DarkMatter extends LinearOpMode {
         cp1 = new Gamepad();
         cp2 = new Gamepad();
         ElapsedTime tm1 = new ElapsedTime();
+        ElapsedTime tm2 = new ElapsedTime();
+        boolean active = false;
         //While loop for OpMode
         while (opModeIsActive()) {
             //Telemetry
-            telemetry.addLine("PITCH: " + ap.getCurrentPosition() + "; YAW: " + ar.getCurrentPosition());
-            telemetry.addLine("fl: " + fl.getCurrentPosition() + "; fr: " + fr.getCurrentPosition() + ";" + "rl: " + rl.getCurrentPosition() + "; rr: " + rr.getCurrentPosition() + ";");
-            telemetry.addLine("MODE: " + (fieldCentric ? "FIELD CENTRIC" : "ROBOT CENTRIC"));
-            telemetry.update();
+            if (!active)
+            {
+                telemetry.addLine("PITCH: " + ap.getCurrentPosition() + "; YAW: " + ar.getCurrentPosition());
+                telemetry.addLine("fl: " + fl.getCurrentPosition() + "; fr: " + fr.getCurrentPosition() + ";" + "rl: " + rl.getCurrentPosition() + "; rr: " + rr.getCurrentPosition() + ";");
+                telemetry.addLine("MODE: " + (fieldCentric ? "FIELD CENTRIC" : "ROBOT CENTRIC"));
+                telemetry.addLine("Red: " + cs.red() + " Green: " + cs.green() + " Blue: " + cs.blue());
+                telemetry.update();
+            }
+            if (cs.red() + cs.green() + cs.blue() > 1200) {
+                telemetry.addLine("omg u hacker");
+                telemetry.update();
+                active = true;
+                tm2.reset();
+            }
+            if (tm2.seconds() > 3) {
+                active = false;
+            }
             //Updates and drives
             Globals.getImu().getPosition();
             y2 = -gamepad1.left_stick_y;

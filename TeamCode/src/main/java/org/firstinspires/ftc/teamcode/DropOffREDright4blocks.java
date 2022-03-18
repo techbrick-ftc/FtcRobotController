@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -26,6 +27,7 @@ public class DropOffREDright4blocks extends LinearOpMode {
     TouchSensor ts1;
     TouchSensor tsleft;
     TouchSensor tsright;
+    ColorSensor cs;
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
     final int ticksHighPitch = -1585;
@@ -150,6 +152,12 @@ public class DropOffREDright4blocks extends LinearOpMode {
         rl.setVelocity(topSpeed - 75);
         rr.setVelocity(topSpeed - 75);
     }
+    public void setSpeed(int speed) {
+        fl.setVelocity(speed);
+        fr.setVelocity(speed);
+        rl.setVelocity(speed);
+        rr.setVelocity(speed);
+    }
     public void runOpMode() {
 //Setting variables
         fl = hardwareMap.get(DcMotorEx.class, "fl");
@@ -164,6 +172,7 @@ public class DropOffREDright4blocks extends LinearOpMode {
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         tsleft = hardwareMap.get(TouchSensor.class, "tsleft");
         tsright = hardwareMap.get(TouchSensor.class, "tsright");
+        cs = hardwareMap.get(ColorSensor.class, "colorSense");
         ar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -229,9 +238,19 @@ public class DropOffREDright4blocks extends LinearOpMode {
         armPos(armPositionsPitch.low, 900, armPositionsYaw.degree90, 1500);
         sleep(1200);
         toEncoder();
-        runInches(22, direction.forward, 1800);
-        armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
+        runInches(22, direction.forward, 1600);
+        boolean alreadyDone = false;
+        while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy() && !alreadyDone) {
+            if (cs.red() + cs.green() + cs.blue() > 1500) {
+                toEncoder();
+                sleep(300);
+                runInches(6, direction.forward, 1200);
+                telemetry.addLine("DETECTED! Pickup 1 Is Almost Done."); telemetry.update();
+                alreadyDone = true;
+            }
+        }
         while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+        armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
         toEncoder();
         cs1.setPower(1);
         cs2.setPower(-1);
@@ -241,13 +260,6 @@ public class DropOffREDright4blocks extends LinearOpMode {
         rl.setVelocity(500);
         rr.setVelocity(500);
         while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (23 * tpi_d) && opModeIsActive()) {
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("RL", rl.getCurrentPosition());
-            telemetry.addData("RR", rr.getCurrentPosition());
-            telemetry.addData("AR", ar.getCurrentPosition());
-            telemetry.addData("AP", ap.getCurrentPosition());
-            telemetry.update();
         }
         int on;
         if (fl.getCurrentPosition() < prevCurrent + (23 * tpi_d)) {
@@ -260,7 +272,8 @@ public class DropOffREDright4blocks extends LinearOpMode {
             armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
             sleep(100);
             runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 28), direction.backward, 2000);
-            while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+            while (fl.getCurrentPosition() > fl.getTargetPosition() + (12 * tpi_d)) {}
+            setSpeed(1300);
             sleep(200);
             toEncoder();
             runInches(21, direction.left, 1300);
@@ -280,8 +293,18 @@ public class DropOffREDright4blocks extends LinearOpMode {
             sleep(1100);
             toEncoder();
             runInches(34, direction.forward, 1800);
-            armPos(armPositionsPitch.intake, 900, armPositionsYaw.current, 0);
+            alreadyDone = false;
+            while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy() && !alreadyDone) {
+                if (cs.red() + cs.green() + cs.blue() > 1500) {
+                    toEncoder();
+                    sleep(300);
+                    runInches(6, direction.forward, 1200);
+                    telemetry.addLine("DETECTED! Pickup 812472357814232 Is Almost Done."); telemetry.update();
+                    alreadyDone = true;
+                }
+            }
             while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+            armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
             cs1.setPower(1);
             cs2.setPower(-1);
             toEncoder();
@@ -292,13 +315,6 @@ public class DropOffREDright4blocks extends LinearOpMode {
             rr.setVelocity(500);
 
             while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (19 * tpi_d) && opModeIsActive()) {
-                telemetry.addData("FL", fl.getCurrentPosition());
-                telemetry.addData("FR", fr.getCurrentPosition());
-                telemetry.addData("RL", rl.getCurrentPosition());
-                telemetry.addData("RR", rr.getCurrentPosition());
-                telemetry.addData("AR", ar.getCurrentPosition());
-                telemetry.addData("AP", ap.getCurrentPosition());
-                telemetry.update();
             }
             if (fl.getCurrentPosition() < prevCurrent + 19 * tpi_d) {
                 fl.setVelocity(0);
@@ -309,8 +325,7 @@ public class DropOffREDright4blocks extends LinearOpMode {
                 cs2.setPower(0);
                 armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
                 sleep(100);
-                runInches((int) Math.round(((fl.getCurrentPosition()) - prevCurrent) / tpi_d + 28), direction.backward, 2000);
-                while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+                runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 28), direction.backward, 2000);
                 sleep(200);
                 toEncoder();
                 runInches(21, direction.left, 1300);
@@ -336,16 +351,25 @@ public class DropOffREDright4blocks extends LinearOpMode {
             }
             if (on == 3) {
 //Pickup 3
-                runInches(23, direction.right, 1300);
+                runInches(25, direction.right, 1300);
                 sleep(300);
                 armPos(armPositionsPitch.low, 1400, armPositionsYaw.degree90, 1500);
                 sleep(1100);
                 toEncoder();
                 runInches(40, direction.forward, 1800);
-                armPos(armPositionsPitch.intake, 900, armPositionsYaw.current, 0);
-                while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
-                }
+                armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
                 armPosDegree(0, 0, -110, 1500);
+                alreadyDone = false;
+                while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy() && !alreadyDone) {
+                    if (cs.red() + cs.green() + cs.blue() > 1500) {
+                        toEncoder();
+                        sleep(300);
+                        runInches(6, direction.forward, 1200);
+                        telemetry.addLine("DETECTED! Pickup 114289891274789124897142142 Is Almost Done."); telemetry.update();
+                        alreadyDone = true;
+                    }
+                }
+                while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
                 cs1.setPower(1);
                 cs2.setPower(-1);
                 toEncoder();
@@ -355,13 +379,6 @@ public class DropOffREDright4blocks extends LinearOpMode {
                 rl.setVelocity(500);
                 rr.setVelocity(500);
                 while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (17 * tpi_d) && opModeIsActive()) {
-                    telemetry.addData("FL", fl.getCurrentPosition());
-                    telemetry.addData("FR", fr.getCurrentPosition());
-                    telemetry.addData("RL", rl.getCurrentPosition());
-                    telemetry.addData("RR", rr.getCurrentPosition());
-                    telemetry.addData("AR", ar.getCurrentPosition());
-                    telemetry.addData("AP", ap.getCurrentPosition());
-                    telemetry.update();
                 }
                 if (fl.getCurrentPosition() < prevCurrent + (17 * tpi_d)) {
                     fl.setVelocity(0);
@@ -372,9 +389,9 @@ public class DropOffREDright4blocks extends LinearOpMode {
                     cs2.setPower(0);
                     armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
                     sleep(100);
-                    runInches((int) Math.round(((fl.getCurrentPosition()) - prevCurrent) / tpi_d + 30), direction.backward, 2000);
-                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-                    sleep(200);
+                    runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 28), direction.backward, 2000);
+                    while (fl.getCurrentPosition() > fl.getTargetPosition() + (12 * tpi_d)) {}
+                    setSpeed(1300);
                     toEncoder();
                     runInches(21, direction.left, 1300);
                     sleep(1200);
@@ -385,7 +402,7 @@ public class DropOffREDright4blocks extends LinearOpMode {
                     cs1.setPower(0);
                     cs2.setPower(0);
 //Park
-                    runInches(23, direction.right, 1800);
+                    runInches(25, direction.right, 1800);
                     sleep(300);
                     armPos(armPositionsPitch.low, 900, armPositionsYaw.current, 0);
                     armPosDegree(0, 0, -78, 1500);
@@ -402,13 +419,8 @@ public class DropOffREDright4blocks extends LinearOpMode {
                     rl.setVelocity(500);
                     rr.setVelocity(500);
                     while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (21 * tpi_d) && opModeIsActive()) {
-                        telemetry.addData("FL", fl.getCurrentPosition());
-                        telemetry.addData("FR", fr.getCurrentPosition());
-                        telemetry.addData("RL", rl.getCurrentPosition());
-                        telemetry.addData("RR", rr.getCurrentPosition());
-                        telemetry.addData("AR", ar.getCurrentPosition());
-                        telemetry.addData("AP", ap.getCurrentPosition());
-                        telemetry.update();
+                    }
+                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
                     }
                     cs1.setPower(0);
                     cs2.setPower(0);
@@ -418,7 +430,6 @@ public class DropOffREDright4blocks extends LinearOpMode {
                     rr.setVelocity(0);
                 }
                 else {
-                    runInches(20, direction.left, 1000);
                     while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
                     }
                     cs1.setPower(0);

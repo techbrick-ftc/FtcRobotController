@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -26,6 +27,7 @@ public class DropOffBLUEleft4blocks extends LinearOpMode {
     TouchSensor ts1;
     TouchSensor tsleft;
     TouchSensor tsright;
+    ColorSensor cs;
     int on = 1;
     final double tpi_s = 46.5567;
     final double tpi_d = 43.0301;
@@ -165,6 +167,7 @@ public class DropOffBLUEleft4blocks extends LinearOpMode {
         ts1 = hardwareMap.get(TouchSensor.class, "ts1");
         tsleft = hardwareMap.get(TouchSensor.class, "tsleft");
         tsright = hardwareMap.get(TouchSensor.class, "tsright");
+        cs = hardwareMap.get(ColorSensor.class, "color");
         ar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ap.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -183,8 +186,6 @@ public class DropOffBLUEleft4blocks extends LinearOpMode {
         telemetry.update();
 //Waits for start of OpMode
         waitForStart();
-        telemetry.addLine("Injecting Dark Matter Automatically...");
-        telemetry.addLine("The world is automatically being consumed...");
         telemetry.update();
         led.setPower(1);
         runInches(24, direction.left, 900);
