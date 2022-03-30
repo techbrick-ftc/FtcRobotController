@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.RobotConstants.fieldCentric;
 import static org.firstinspires.ftc.teamcode.RobotConstants.speedUp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +12,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -40,7 +40,7 @@ public class DarkMatter extends LinearOpMode {
     double turningspeed = 0.5;
     boolean runningInput = false;
     boolean pressed = false;
-    boolean fieldCentric = true;
+    public static boolean isDriving = false;
     boolean driveAllowed;
     boolean quacking = false;
     int quackingOn = 0;
@@ -62,11 +62,10 @@ public class DarkMatter extends LinearOpMode {
         double backLeftPower = (y - x + rx) / denominator;
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
-
-        fl.setVelocity((frontLeftPower * driveSpeed) * 2000);
-        rl.setVelocity((backLeftPower * driveSpeed) * 2000);
-        fr.setVelocity((frontRightPower * driveSpeed) * 2000);
-        rr.setVelocity((backRightPower * driveSpeed) * 2000);
+        fl.setVelocity((frontLeftPower * driveSpeed) * 2100);
+        rl.setVelocity((backLeftPower * driveSpeed) * 2100);
+        fr.setVelocity((frontRightPower * driveSpeed) * 2100);
+        rr.setVelocity((backRightPower * driveSpeed) * 2100);
     }
     //
     //RobotCentric Drive Control
@@ -77,7 +76,6 @@ public class DarkMatter extends LinearOpMode {
         double backLeftPower = (y2 - x2 + rx) / denominator;
         double frontRightPower = (y2 - x2 - rx) / denominator;
         double backRightPower = (y2 + x2 - rx) / denominator;
-
         fl.setVelocity((frontLeftPower * driveSpeed) * 1800);
         rl.setVelocity((backLeftPower * driveSpeed) * 1800);
         fr.setVelocity((frontRightPower * driveSpeed) * 1800);
@@ -91,22 +89,22 @@ public class DarkMatter extends LinearOpMode {
         if (onx > 0.05 && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 950);
+            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 50);
         }
         else if (onx < -0.05 && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 950);
+            ar.setVelocity(-Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 1050);
         }
         else if (gamepad2.dpad_right && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setVelocity(200);
+            ar.setVelocity(250);
         }
         else if (gamepad2.dpad_left && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setVelocity(-200);
+            ar.setVelocity(-250);
         }
         else if (!ar.isBusy()) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
@@ -134,7 +132,7 @@ public class DarkMatter extends LinearOpMode {
         else if (gamepad2.right_stick_y < -0.05 && (ap.getCurrentPosition() > -2890 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ap.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ap.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ap.setVelocity(-350);
+            ap.setVelocity(-425);
         }
         //Arm down slow
         else if (gamepad2.right_stick_y > 0.05 && ( ap.getCurrentPosition() < 0 || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
@@ -293,41 +291,31 @@ public class DarkMatter extends LinearOpMode {
         cp1 = new Gamepad();
         cp2 = new Gamepad();
         ElapsedTime tm1 = new ElapsedTime();
-        ElapsedTime tm2 = new ElapsedTime();
-        boolean active = false;
         //While loop for OpMode
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !RobotConstants.errorStop) {
             //Telemetry
-            if (!active)
-            {
-                telemetry.addLine("PITCH: " + ap.getCurrentPosition() + "; YAW: " + ar.getCurrentPosition());
-                telemetry.addLine("fl: " + fl.getCurrentPosition() + "; fr: " + fr.getCurrentPosition() + ";" + "rl: " + rl.getCurrentPosition() + "; rr: " + rr.getCurrentPosition() + ";");
-                telemetry.addLine("MODE: " + (fieldCentric ? "FIELD CENTRIC" : "ROBOT CENTRIC"));
-                telemetry.addLine("Red: " + cs.red() + " Green: " + cs.green() + " Blue: " + cs.blue());
-                telemetry.update();
-            }
-            if (cs.red() + cs.green() + cs.blue() > 1200) {
-                telemetry.addLine("omg u hacker");
-                telemetry.update();
-                active = true;
-                tm2.reset();
-            }
-            if (tm2.seconds() > 3) {
-                active = false;
-            }
+            telemetry.addLine("PITCH: " + ap.getCurrentPosition() + "; YAW: " + ar.getCurrentPosition());
+            telemetry.addLine("fl: " + fl.getCurrentPosition() + "; fr: " + fr.getCurrentPosition() + ";" + "rl: " + rl.getCurrentPosition() + "; rr: " + rr.getCurrentPosition() + ";");
+            telemetry.addLine("MODE: " + (fieldCentric ? "FIELD CENTRIC" : "ROBOT CENTRIC"));
+            telemetry.addLine("Red: " + cs.red() + " Green: " + cs.green() + " Blue: " + cs.blue());
+            telemetry.update();
             //Updates and drives
             Globals.getImu().getPosition();
             y2 = -gamepad1.left_stick_y;
             x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
-            driveAllowed = y2 > 0.05 || x2 > 0.05 || rx > 0.05 || y2 < -0.05 || x2 < -0.05 || rx < -0.05;
+            driveAllowed = (y2 > 0.05 || x2 > 0.05 || rx > 0.05 || y2 < -0.05 || x2 < -0.05 || rx < -0.05) && !RobotConstants.justNoneDrive;
             if (driveAllowed) {
+                isDriving = true;
                 if (fieldCentric) {
                     fieldCentricDrive(x2, y2, rx);
                 }
                 else {
                     robotCentricDrive(x2, y2, rx);
                 }
+            }
+            else {
+                isDriving = false;
             }
             //Duck spin
             if (gamepad1.b || gamepad1.x || quacking) {

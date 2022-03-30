@@ -66,13 +66,41 @@ public class DropOffREDright4blocks extends LinearOpMode {
         rl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         if (speed < 1400) {
-            fl.setVelocity(speed);
-            fr.setVelocity(speed);
-            rl.setVelocity(speed);
-            rr.setVelocity(speed);
+            setSpeed((int)speed);
         }
         else
             speedUp(speed);
+    }
+    public void runInchesNoAcc(int inches, direction direct, double speed) {
+        if (direct == direction.forward) {
+            fl.setTargetPosition((int)(Math.round(tpi_d * inches) + fl.getCurrentPosition()));
+            fr.setTargetPosition((int)(Math.round(tpi_d * inches) + fr.getCurrentPosition()));
+            rl.setTargetPosition((int)(Math.round(tpi_d * inches) + rl.getCurrentPosition()));
+            rr.setTargetPosition((int)(Math.round(tpi_d * inches) + rr.getCurrentPosition()));
+        }
+        else if (direct == direction.backward) {
+            fl.setTargetPosition((int)(Math.round(tpi_d * -inches) + fl.getCurrentPosition()));
+            fr.setTargetPosition((int)(Math.round(tpi_d * -inches) + fr.getCurrentPosition()));
+            rl.setTargetPosition((int)(Math.round(tpi_d * -inches) + rl.getCurrentPosition()));
+            rr.setTargetPosition((int)(Math.round(tpi_d * -inches) + rr.getCurrentPosition()));
+        }
+        else if (direct == direction.right) {
+            fl.setTargetPosition((int)(Math.round(tpi_s * inches) + fl.getCurrentPosition()));
+            fr.setTargetPosition((int)(Math.round(tpi_s * -inches) + fr.getCurrentPosition()));
+            rl.setTargetPosition((int)(Math.round(tpi_s * -inches) + rl.getCurrentPosition()));
+            rr.setTargetPosition((int)(Math.round(tpi_s * inches) + rr.getCurrentPosition()));
+        }
+        else if (direct == direction.left) {
+            fl.setTargetPosition((int)(Math.round(tpi_s * -inches) + fl.getCurrentPosition()));
+            fr.setTargetPosition((int)(Math.round(tpi_s * inches) + fr.getCurrentPosition()));
+            rl.setTargetPosition((int)(Math.round(tpi_s * inches) + rl.getCurrentPosition()));
+            rr.setTargetPosition((int)(Math.round(tpi_s * -inches) + rr.getCurrentPosition()));
+        }
+        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setSpeed((int)speed);
     }
     public void armPos(armPositionsPitch positionPitch, int speedPitch, armPositionsYaw positionYaw, int speedYaw) {
         if (positionPitch == armPositionsPitch.intake) {
@@ -187,15 +215,18 @@ public class DropOffREDright4blocks extends LinearOpMode {
         rr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setDirection(DcMotorSimple.Direction.REVERSE); rl.setDirection(DcMotorSimple.Direction.REVERSE);
         Globals.setupIMU(hardwareMap);
-        telemetry.addLine("Injecting Dark Matter Automatically...");
+        telemetry.addLine("Injecting Dark Matter Automatically... Version: 1.0.0");
         telemetry.update();
 //Waits for start of OpMode
         waitForStart();
+        if (RobotConstants.errorStop) {
+            stop();
+        }
         telemetry.addLine("Injecting Dark Matter Automatically...");
         telemetry.addLine("The world is automatically being consumed...");
         telemetry.update();
         led.setPower(1);
-        runInches(24, direction.left, 1300);
+        runInches(24, direction.left, 1390);
         sleep(100);
         armPos(armPositionsPitch.middle, 2500, armPositionsYaw.current, 0);
         sleep(200);
@@ -207,53 +238,54 @@ public class DropOffREDright4blocks extends LinearOpMode {
             armPos(armPositionsPitch.lvl1, 2500, armPositionsYaw.current, 0);
             sleep(500);
             armPosDegree(0, 0, -236, 800);
-            sleep(500);
+            sleep(400);
         }
         else if (!tsleft.isPressed() && tsright.isPressed()) {
             armPos(armPositionsPitch.middle, 2200, armPositionsYaw.current, 0);
             sleep(500);
             armPosDegree(0, 0, -248, 900);
-            sleep(500);
+            sleep(400);
         }
         else {
             armPos(armPositionsPitch.output, 2500, armPositionsYaw.current, 0);
             sleep(500);
             armPosDegree(0, 0, -248, 900);
-            sleep(500);
+            sleep(400);
         }
         toEncoder();
-        cs1.setPower(-0.55);
-        cs2.setPower(0.55);
-        sleep(600);
+        cs1.setPower(-0.6);
+        cs2.setPower(0.6);
+        sleep(500);
         cs1.setPower(0);
         cs2.setPower(0);
 //PICKUP #1
         if (tsleft.isPressed() && !tsright.isPressed()) {
-            runInches(28, direction.right, 1300);
+            runInches(28, direction.right, 1390);
         }
         else {
-            runInches(34, direction.right, 1300);
+            runInches(34, direction.right, 1390);
         }
         sleep(600);
-        armPos(armPositionsPitch.low, 900, armPositionsYaw.degree90, 1500);
-        sleep(1200);
+        armPos(armPositionsPitch.low, 900, armPositionsYaw.current, 0);
+        armPosDegree(0, 0, -80, 1500);
+        sleep(1000);
         toEncoder();
-        runInches(22, direction.forward, 1600);
+        runInches(29, direction.forward, 1200);
+        armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
+        cs1.setPower(1);
+        cs2.setPower(-1);
         boolean alreadyDone = false;
         while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy() && !alreadyDone) {
-            if (cs.red() + cs.green() + cs.blue() > 1500) {
-                toEncoder();
-                sleep(300);
+            if (cs.red() + cs.green() + cs.blue() > 1000) {
+                led.setPower(0);
                 runInches(6, direction.forward, 1200);
                 telemetry.addLine("DETECTED! Pickup 1 Is Almost Done."); telemetry.update();
                 alreadyDone = true;
             }
         }
         while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-        armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
+        led.setPower(1);
         toEncoder();
-        cs1.setPower(1);
-        cs2.setPower(-1);
         int prevCurrent = fl.getCurrentPosition();
         fl.setVelocity(500);
         fr.setVelocity(500);
@@ -261,7 +293,6 @@ public class DropOffREDright4blocks extends LinearOpMode {
         rr.setVelocity(500);
         while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (23 * tpi_d) && opModeIsActive()) {
         }
-        int on;
         if (fl.getCurrentPosition() < prevCurrent + (23 * tpi_d)) {
             fl.setVelocity(0);
             fr.setVelocity(0);
@@ -270,43 +301,49 @@ public class DropOffREDright4blocks extends LinearOpMode {
             cs1.setPower(0);
             cs2.setPower(0);
             armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
-            sleep(100);
-            runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 28), direction.backward, 2000);
-            while (fl.getCurrentPosition() > fl.getTargetPosition() + (12 * tpi_d)) {}
-            setSpeed(1300);
+            runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 34), direction.backward, 2450);
+            while (fl.getCurrentPosition() > fl.getTargetPosition() + (16 * tpi_d)) {}
+            setSpeed(1150);
+            led.setPower(0);
+            while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
+            led.setPower(1);
+            toEncoder();
+            runInchesNoAcc(6, direction.right, 2450);
             sleep(200);
             toEncoder();
-            runInches(21, direction.left, 1300);
-            sleep(1200);
+            runInches(21, direction.left, 1390);
+            sleep(1100);
             toEncoder();
-            cs1.setPower(-0.55);
-            cs2.setPower(0.55);
-            sleep(600);
+            cs1.setPower(-0.6);
+            cs2.setPower(0.6);
+            sleep(500);
             cs1.setPower(0);
             cs2.setPower(0);
 //Pickup #2
-            on = 2;
-            runInches(25, direction.right, 1300);
+            runInches(25, direction.right, 1390);
             sleep(300);
             armPos(armPositionsPitch.low, 1400, armPositionsYaw.current, 0);
-            armPosDegree(0, 0, -70, 1500);
+            armPosDegree(0, 0, -84, 1500);
             sleep(1100);
             toEncoder();
-            runInches(34, direction.forward, 1800);
+            runInches(34, direction.forward, 1200);
+            armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
+            cs1.setPower(1);
+            cs2.setPower(-1);
             alreadyDone = false;
             while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy() && !alreadyDone) {
-                if (cs.red() + cs.green() + cs.blue() > 1500) {
-                    toEncoder();
+                if (cs.red() + cs.green() + cs.blue() > 1000) {
+                    led.setPower(0);
                     sleep(300);
+                    armPosDegree(0, 0, -105, 1600);
                     runInches(6, direction.forward, 1200);
-                    telemetry.addLine("DETECTED! Pickup 812472357814232 Is Almost Done."); telemetry.update();
+                    telemetry.addLine("DETECTED! Pickup 2 Is Almost Done."); telemetry.update();
                     alreadyDone = true;
                 }
             }
             while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-            armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
-            cs1.setPower(1);
-            cs2.setPower(-1);
+            armPosDegree(0, 0, -105, 1600);
+            led.setPower(1);
             toEncoder();
             prevCurrent = fl.getCurrentPosition();
             fl.setVelocity(500);
@@ -314,9 +351,9 @@ public class DropOffREDright4blocks extends LinearOpMode {
             rl.setVelocity(500);
             rr.setVelocity(500);
 
-            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (19 * tpi_d) && opModeIsActive()) {
+            while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (25 * tpi_d) && opModeIsActive()) {
             }
-            if (fl.getCurrentPosition() < prevCurrent + 19 * tpi_d) {
+            if (fl.getCurrentPosition() < prevCurrent + 25 * tpi_d) {
                 fl.setVelocity(0);
                 fr.setVelocity(0);
                 rl.setVelocity(0);
@@ -324,63 +361,58 @@ public class DropOffREDright4blocks extends LinearOpMode {
                 cs1.setPower(0);
                 cs2.setPower(0);
                 armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
-                sleep(100);
-                runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 28), direction.backward, 2000);
-                sleep(200);
-                toEncoder();
-                runInches(21, direction.left, 1300);
-                sleep(1200);
-                toEncoder();
-                cs1.setPower(-0.55);
-                cs2.setPower(0.55);
-                sleep(600);
-                cs1.setPower(0);
-                cs2.setPower(0);
-                on = 3;
-            }
-            else {
-                runInches(20, direction.left, 1000);
+                runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 34), direction.backward, 2450);
+                while (fl.getCurrentPosition() > fl.getTargetPosition() + (16 * tpi_d)) {}
+                led.setPower(0);
+                setSpeed(1150);
                 while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
                 }
-                cs1.setPower(0);
-                cs2.setPower(0);
-                fl.setVelocity(0);
-                fr.setVelocity(0);
-                rl.setVelocity(0);
-                rr.setVelocity(0);
-            }
-            if (on == 3) {
-//Pickup 3
-                runInches(25, direction.right, 1300);
-                sleep(300);
-                armPos(armPositionsPitch.low, 1400, armPositionsYaw.degree90, 1500);
+                led.setPower(1);
+                toEncoder();
+                runInchesNoAcc(6, direction.right, 2450);
+                sleep(200);
+                toEncoder();
+                runInches(21, direction.left, 1390);
                 sleep(1100);
                 toEncoder();
-                runInches(40, direction.forward, 1800);
-                armPos(armPositionsPitch.intake, 2500, armPositionsYaw.current, 0);
-                armPosDegree(0, 0, -110, 1500);
+                cs1.setPower(-0.6);
+                cs2.setPower(0.6);
+                sleep(500);
+                cs1.setPower(0);
+                cs2.setPower(0);
+//Pickup #3
+                runInches(25, direction.right, 1390);
+                sleep(300);
+                armPos(armPositionsPitch.low, 1400, armPositionsYaw.current, 0);
+                armPosDegree(0, 0, -84, 1500);
+                cs1.setPower(1);
+                cs2.setPower(-1);
+                sleep(1100);
+                toEncoder();
+                runInches(34, direction.forward, 1200);
+                armPos(armPositionsPitch.intake, 2500, armPositionsYaw.degree90, 1000);
                 alreadyDone = false;
                 while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy() && !alreadyDone) {
-                    if (cs.red() + cs.green() + cs.blue() > 1500) {
-                        toEncoder();
-                        sleep(300);
+                    if (cs.red() + cs.green() + cs.blue() > 1000) {
+                        led.setPower(0);
+                        armPos(armPositionsPitch.current, 0, armPositionsYaw.degree90, 1500);
                         runInches(6, direction.forward, 1200);
-                        telemetry.addLine("DETECTED! Pickup 114289891274789124897142142 Is Almost Done."); telemetry.update();
+                        telemetry.addLine("DETECTED! Pickup 3 Is Almost Done."); telemetry.update();
                         alreadyDone = true;
                     }
                 }
                 while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-                cs1.setPower(1);
-                cs2.setPower(-1);
+                led.setPower(1);
                 toEncoder();
+                armPos(armPositionsPitch.current, 0, armPositionsYaw.degree90, 1500);
                 prevCurrent = fl.getCurrentPosition();
                 fl.setVelocity(500);
                 fr.setVelocity(500);
                 rl.setVelocity(500);
                 rr.setVelocity(500);
-                while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (17 * tpi_d) && opModeIsActive()) {
+                while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (25 * tpi_d) && opModeIsActive()) {
                 }
-                if (fl.getCurrentPosition() < prevCurrent + (17 * tpi_d)) {
+                if (fl.getCurrentPosition() < prevCurrent + (25 * tpi_d)) {
                     fl.setVelocity(0);
                     fr.setVelocity(0);
                     rl.setVelocity(0);
@@ -388,49 +420,45 @@ public class DropOffREDright4blocks extends LinearOpMode {
                     cs1.setPower(0);
                     cs2.setPower(0);
                     armPos(armPositionsPitch.output, 2500, armPositionsYaw.degree225, 800);
-                    sleep(100);
-                    runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 28), direction.backward, 2000);
-                    while (fl.getCurrentPosition() > fl.getTargetPosition() + (12 * tpi_d)) {}
-                    setSpeed(1300);
+                    runInches((int) Math.round((fl.getCurrentPosition() - prevCurrent) / tpi_d + 34), direction.backward, 2450);
+                    while (fl.getCurrentPosition() > fl.getTargetPosition() + (16 * tpi_d)) {
+                    }
+                    led.setPower(0);
+                    setSpeed(1150);
+                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
+                    }
+                    led.setPower(1);
                     toEncoder();
-                    runInches(21, direction.left, 1300);
-                    sleep(1200);
+                    runInchesNoAcc(6, direction.right, 2450);
+                    sleep(200);
                     toEncoder();
-                    cs1.setPower(-0.55);
-                    cs2.setPower(0.55);
-                    sleep(600);
+                    runInches(21, direction.left, 1390);
+                    sleep(1100);
+                    toEncoder();
+                    cs1.setPower(-0.6);
+                    cs2.setPower(0.6);
+                    sleep(500);
                     cs1.setPower(0);
                     cs2.setPower(0);
-//Park
-                    runInches(25, direction.right, 1800);
+                    //Park
+                    runInches(25, direction.right, 1390);
                     sleep(300);
                     armPos(armPositionsPitch.low, 900, armPositionsYaw.current, 0);
-                    armPosDegree(0, 0, -78, 1500);
-                    sleep(900);
+                    armPosDegree(0, 0, -70, 1500);
+                    sleep(1100);
                     toEncoder();
-                    runInches(30, direction.forward, 2000);
+                    runInches(33, direction.forward, 2400);
                     armPos(armPositionsPitch.intake, 2200, armPositionsYaw.current, 0);
-                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {}
-                    toEncoder();
                     cs1.setPower(1);
                     cs2.setPower(-1);
+                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
+                    }
+                    toEncoder();
                     fl.setVelocity(500);
                     fr.setVelocity(500);
                     rl.setVelocity(500);
                     rr.setVelocity(500);
                     while (!ts1.isPressed() && fl.getCurrentPosition() < prevCurrent + (21 * tpi_d) && opModeIsActive()) {
-                    }
-                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
-                    }
-                    cs1.setPower(0);
-                    cs2.setPower(0);
-                    fl.setVelocity(0);
-                    fr.setVelocity(0);
-                    rl.setVelocity(0);
-                    rr.setVelocity(0);
-                }
-                else {
-                    while (fl.isBusy() && fr.isBusy() && rl.isBusy() && rr.isBusy()) {
                     }
                     cs1.setPower(0);
                     cs2.setPower(0);
@@ -445,9 +473,6 @@ public class DropOffREDright4blocks extends LinearOpMode {
         fr.setVelocity(0);
         rl.setVelocity(0);
         rr.setVelocity(0);
-        cs1.setPower(-0.1);
-        cs2.setPower(0.1);
-        sleep(4);
         cs1.setPower(0);
         cs2.setPower(0);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
