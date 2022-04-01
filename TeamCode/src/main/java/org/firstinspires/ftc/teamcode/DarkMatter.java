@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.RobotConstants.fieldCentric;
-import static org.firstinspires.ftc.teamcode.RobotConstants.speedUp;
+import static org.firstinspires.ftc.teamcode.hecks.fieldCentric;
+import static org.firstinspires.ftc.teamcode.hecks.speedUp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -89,7 +89,7 @@ public class DarkMatter extends LinearOpMode {
         if (onx > 0.05 && (ar.getCurrentPosition() < yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
                 ar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 50);
+            ar.setVelocity(Math.sqrt(gamepad2.left_stick_x * gamepad2.left_stick_x + gamepad2.left_stick_y * gamepad2.left_stick_y) * 1050);
         }
         else if (onx < -0.05 && (ar.getCurrentPosition() > -2336 + yawOffSet || gamepad2.left_stick_button || gamepad2.right_stick_button)) {
             if (ar.getMode() != DcMotor.RunMode.RUN_USING_ENCODER)
@@ -292,7 +292,7 @@ public class DarkMatter extends LinearOpMode {
         cp2 = new Gamepad();
         ElapsedTime tm1 = new ElapsedTime();
         //While loop for OpMode
-        while (opModeIsActive() && !RobotConstants.errorStop) {
+        while (opModeIsActive() && !hecks.errorStop) {
             //Telemetry
             telemetry.addLine("PITCH: " + ap.getCurrentPosition() + "; YAW: " + ar.getCurrentPosition());
             telemetry.addLine("fl: " + fl.getCurrentPosition() + "; fr: " + fr.getCurrentPosition() + ";" + "rl: " + rl.getCurrentPosition() + "; rr: " + rr.getCurrentPosition() + ";");
@@ -301,10 +301,11 @@ public class DarkMatter extends LinearOpMode {
             telemetry.update();
             //Updates and drives
             Globals.getImu().getPosition();
+            speedUp(fl, fr, rl, rr);
             y2 = -gamepad1.left_stick_y;
             x2 = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x * turningspeed;
-            driveAllowed = (y2 > 0.05 || x2 > 0.05 || rx > 0.05 || y2 < -0.05 || x2 < -0.05 || rx < -0.05) && !RobotConstants.justNoneDrive;
+            driveAllowed = (y2 > 0.05 || x2 > 0.05 || rx > 0.05 || y2 < -0.05 || x2 < -0.05 || rx < -0.05) && !hecks.justNoneDrive;
             if (driveAllowed) {
                 isDriving = true;
                 if (fieldCentric) {
@@ -369,7 +370,6 @@ public class DarkMatter extends LinearOpMode {
             else {
                 tmc.setPower(0);
             }
-            speedUp(fl, fr, rl, rr);
             // Drives forward
             if (gamepad1.dpad_up) {
                 fl.setVelocity(1600);
